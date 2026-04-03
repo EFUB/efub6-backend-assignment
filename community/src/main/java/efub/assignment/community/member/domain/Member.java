@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -34,6 +35,12 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String studentId;
 
+    @Column (nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
     @Enumerated (EnumType.STRING)
     private MemberStatus memberStatus;
 
@@ -46,6 +53,7 @@ public class Member {
         this.university = university;
         this.studentId = studentId;
         this.memberStatus = MemberStatus.REGISTER;
+        this.createdAt = LocalDateTime.now();
     }
 
     public void updateProfile(String email, String password, String nickname,
@@ -55,6 +63,7 @@ public class Member {
         this.nickname = nickname;
         this.university = university;
         this.studentId = studentId;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void changeStatus(MemberStatus memberStatus) {
