@@ -1,4 +1,4 @@
-package efub.assignment.community.global.exception;
+package efub.assignment.community.global.exception.dto;
 
 import efub.assignment.community.global.response.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
