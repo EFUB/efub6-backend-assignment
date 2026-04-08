@@ -1,5 +1,7 @@
 package efub.assignment.community.member.service;
 
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.domain.MemberStatus;
 import efub.assignment.community.member.dto.request.CreateMemberRequestDto;
@@ -60,5 +62,10 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("No message available"));
 
         member.changeStatus(MemberStatus.UNREGISTER);
+    }
+
+    public Member findByMemberId(Long memberId) {
+        return memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }
