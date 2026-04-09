@@ -15,7 +15,7 @@ public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long boardId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member owner;
