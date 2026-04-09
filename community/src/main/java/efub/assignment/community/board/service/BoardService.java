@@ -70,7 +70,7 @@ public class BoardService {
         }
     }
 
-    private Board findByBoardId(Long boardId) {
+    public Board findByBoardId(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
