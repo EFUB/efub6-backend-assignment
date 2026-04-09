@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class MembersService {
+public class MemberService {
 
     private final MemberRepository memberRepository;
 
