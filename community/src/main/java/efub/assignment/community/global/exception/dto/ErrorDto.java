@@ -1,4 +1,4 @@
-package efub.assignment.community.global.exception;
+package efub.assignment.community.global.exception.dto;
 
 public record ErrorDto(
         String timestamp,
