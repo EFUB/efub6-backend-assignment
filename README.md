@@ -2,10 +2,10 @@
 
 ### 1-1주차 과제
 #### API 명세서
-[API 명세서](https://uttermost-harp-2b1.notion.site/API-32796f8c066a80208ad4e82aa785796d?source=copy_link)
+[API 명세서](https://namwoooo.notion.site/32796f8c066a80208c50f0cff1c99e41?v=32796f8c066a8150bc03000cc5eeb637&source=copy_link)
 <br />
 
 
 #### ERD 
-<img width="2350" height="1032" alt="efub6_seminar3" src="https://github.com/user-attachments/assets/34edc4b8-88b9-451b-aab3-335b3671c7d9" />
+<img width="2360" height="1002" alt="efub6_seminar3_수정" src="https://github.com/user-attachments/assets/bf60d44e-5d1d-41ea-9c2c-937044e18f2f" />
 

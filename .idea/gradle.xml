@@ -5,6 +5,8 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/community" />
+        <option name="gradleHome" value="C:\gradle\gradle-9.1.0" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/community" />
@@ -13,6 +15,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/community/community" />
+        <option name="gradleHome" value="C:\gradle\gradle-9.1.0" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/community/community" />

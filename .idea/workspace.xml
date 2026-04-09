@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e99704bc-252a-4eea-a86f-ef64c75b336d" name="변경" comment="프로젝트 삭제">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/efub6-backend-assignment.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+    <list default="true" id="e99704bc-252a-4eea-a86f-ef64c75b336d" name="변경" comment="feat: member controller 생성">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/community/src/main/java/efub/assignment/community/member/controller/MembersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/community/src/main/java/efub/assignment/community/member/controller/MembersController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/community/src/main/java/efub/assignment/community/member/dto/response/CreateMemberResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/community/src/main/java/efub/assignment/community/member/dto/response/GetMemberResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/community/src/main/java/efub/assignment/community/member/service/MembersService.java" beforeDir="false" afterPath="$PROJECT_DIR$/community/src/main/java/efub/assignment/community/member/service/MembersService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +54,9 @@
     &quot;accountId&quot;: &quot;c2108f87-f168-45d7-bc3d-36d1f048dfeb&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -69,9 +69,15 @@
   &quot;keyToString&quot;: {
     &quot;Gradle.community 빌드.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.CommunityApplication (1).executor&quot;: &quot;Run&quot;,
     &quot;Spring Boot.CommunityApplication.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
@@ -80,7 +86,7 @@
     &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.build&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -92,17 +98,10 @@
       <recent name="C:\Users\smkpd\OneDrive\바탕 화면\과제\EFUB6기_2026\efub6-backend-assignment\community" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.CommunityApplication">
+  <component name="RunManager">
     <configuration name="CommunityApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="efub.assignment.community.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="efub.assignment.community.CommunityApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CommunityApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="community.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.community.CommunityApplication" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="efub.assignment.community.CommunityApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -124,7 +123,10 @@
       <option name="presentableId" value="Default" />
       <updated>1775052034309</updated>
       <workItem from="1775052035654" duration="884000" />
-      <workItem from="1775053024259" duration="2748000" />
+      <workItem from="1775053024259" duration="2966000" />
+      <workItem from="1775109978056" duration="599000" />
+      <workItem from="1775113103176" duration="8125000" />
+      <workItem from="1775122141735" duration="1288000" />
     </task>
     <task id="LOCAL-00001" summary="init: 스프링 부트 프로젝트 초기 설정">
       <option name="closed" value="true" />
@@ -142,7 +144,55 @@
       <option name="project" value="LOCAL" />
       <updated>1775054655341</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="init: 프로젝트 초기 설정">
+      <option name="closed" value="true" />
+      <created>1775056016084</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775056016084</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat: member 도메인 및 request dto 생성">
+      <option name="closed" value="true" />
+      <created>1775116308205</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1775116308205</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat: response dto 생성">
+      <option name="closed" value="true" />
+      <created>1775116982826</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1775116982826</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: member repository 생성">
+      <option name="closed" value="true" />
+      <created>1775117181913</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1775117181913</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: member service 생성">
+      <option name="closed" value="true" />
+      <created>1775118329206</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1775118329207</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: member controller 생성">
+      <option name="closed" value="true" />
+      <created>1775121946894</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1775121946894</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -151,6 +201,12 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init: 스프링 부트 프로젝트 초기 설정" />
     <MESSAGE value="프로젝트 삭제" />
-    <option name="LAST_COMMIT_MESSAGE" value="프로젝트 삭제" />
+    <MESSAGE value="init: 프로젝트 초기 설정" />
+    <MESSAGE value="feat: member 도메인 및 request dto 생성" />
+    <MESSAGE value="feat: response dto 생성" />
+    <MESSAGE value="feat: member repository 생성" />
+    <MESSAGE value="feat: member service 생성" />
+    <MESSAGE value="feat: member controller 생성" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: member controller 생성" />
   </component>
 </project>
