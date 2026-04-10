@@ -1,7 +1,7 @@
 package efub.assignment.community.post.service;
 
-import efub.assignment.community.global.exception.dto.CustomException;
-import efub.assignment.community.global.exception.dto.ErrorCode;
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.service.MembersService;
 import efub.assignment.community.post.domain.Post;

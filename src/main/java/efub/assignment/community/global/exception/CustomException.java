@@ -1,4 +1,4 @@
-package efub.assignment.community.global.exception.dto;
+package efub.assignment.community.global.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -58,4 +58,10 @@ public class MembersService {
         return membersRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다."));
     }
+
+    @Transactional(readOnly = true)
+    public Member findByNickname(String nickname) {
+        return membersRepository.findByNickname(nickname)
+                .orElseThrow(() -> new IllegalArgumentException("해당 닉네임을 가진 회원을 찾을 수 없습니다. 닉네임: " + nickname));
+    }
 }
