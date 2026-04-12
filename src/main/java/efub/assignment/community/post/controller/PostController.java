@@ -13,33 +13,35 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
 
-    // 게시물 생성
-    @PostMapping
-    public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequest request) {
-        Long id = postService.createPost(request);
-        return ResponseEntity.created(URI.create("/posts/"+id)).build();
+    // 게시글 생성
+    @PostMapping("/boards/{boardId}/posts")
+    public ResponseEntity<Void> createPost(
+            @PathVariable("boardId") Long boardId,
+            @RequestHeader("Auth-Id") Long memberId,
+            @Valid @RequestBody PostCreateRequest request) {
+        Long postId = postService.createPost(boardId, memberId, request);
+        return ResponseEntity.created(URI.create("/boards/"+boardId+"/posts/"+postId)).build();
     }
 
-    // 게시물 전체 조회
-    @GetMapping
+    // 게시글 전체 조회
+    @GetMapping("/posts")
     public ResponseEntity<PostListResponse> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
-    // 게시물 단건 내용 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<PostResponse> getPost(@PathVariable("id") Long id) {
+    // 게시글 단건 내용 조회
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<PostResponse> getPost(@PathVariable("postId") Long id) {
         return ResponseEntity.ok(postService.getPost(id));
     }
 
     // 게시글 수정
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePostContent(@PathVariable("id") Long postId,
+    @PatchMapping("/posts/{postId}")
+    public ResponseEntity<Void> updatePostContent(@PathVariable("postId") Long postId,
                                                   @RequestHeader("Auth-Id") Long memberId,
                                                   @RequestBody PostUpdateRequest request) {
         postService.updatePostContent(postId, request, memberId);
@@ -47,8 +49,8 @@ public class PostController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable("id") Long postId,
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable("postId") Long postId,
                                            @RequestHeader("Auth-Id") Long memberId) {
         postService.deletePost(postId, memberId);
         return ResponseEntity.noContent().build();

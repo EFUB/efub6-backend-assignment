@@ -1,6 +1,7 @@
 package efub.assignment.community.post.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import efub.assignment.community.board.domain.Board;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.post.domain.Post;
 import jakarta.validation.constraints.NotBlank;
@@ -12,9 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostCreateRequest{
-    @NotNull
-    private Long memberId;
+public class PostCreateRequest {
 
     @NotBlank(message = "제목을 입력해야 합니다.")
     private String title;
@@ -27,8 +26,9 @@ public class PostCreateRequest{
     private Boolean isAnonymous;
 
 
-    public Post toEntity(Member member) {
+    public Post toEntity(Board board, Member member) {
         return Post.builder()
+                .board(board)
                 .title(title)
                 .content(content)
                 .writer(member)

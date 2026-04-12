@@ -1,5 +1,7 @@
 package efub.assignment.community.post.service;
 
+import efub.assignment.community.board.domain.Board;
+import efub.assignment.community.board.repository.BoardRepository;
 import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
@@ -23,12 +25,17 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
     private final MembersService membersService;
+    private final BoardRepository boardRepository;
 
     @Transactional
-    public Long createPost(@Valid PostCreateRequest request) {
-        Member writerMember = membersService.findByMemberId(request.getMemberId());
+    public Long createPost(Long boardId, Long memberId, @Valid PostCreateRequest request) {
+        Member writerMember = membersService.findByMemberId(memberId);
 
-        Post newPost = request.toEntity(writerMember);
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        Post newPost = request.toEntity(board, writerMember);
+
         postRepository.save(newPost);
         return newPost.getId();
     }

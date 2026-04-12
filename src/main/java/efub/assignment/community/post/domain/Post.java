@@ -1,5 +1,6 @@
 package efub.assignment.community.post.domain;
 
+import efub.assignment.community.board.domain.Board;
 import efub.assignment.community.global.domain.BaseEntity;
 import efub.assignment.community.member.domain.Member;
 import jakarta.persistence.*;
@@ -22,6 +23,10 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id") // 테이블 컬럼명은 board_id로!
+    private Board board;
+
     @Column(nullable = false)
     private String title;
 
@@ -36,7 +41,8 @@ public class Post extends BaseEntity {
 
     // 처음 default value가 있을 경우 파라미터롤 받지 않음!
     @Builder
-    public Post(Member writer, String title, String content, boolean isAnonymous) {
+    public Post(Board board, Member writer, String title, String content, boolean isAnonymous) {
+        this.board = board;
         this.writer = writer;
         this.title = title;
         this.content = content;
