@@ -19,7 +19,11 @@ public enum ErrorCode {
 
     // board
     BOARD_NOT_FOUND(404, "존재하지 않는 게시판입니다."),
-    BOARD_ACCOUNT_MISMATCH(403, "게시판 생성자가 아닙니다.");
+    BOARD_ACCOUNT_MISMATCH(403, "게시판 생성자가 아닙니다."),
+
+    // comment
+    COMMENT_NOT_FOUND(404, "존재하지 않는 댓글입니다."),
+    COMMENT_ACCOUNT_MISMATCH(403, "댓글 작성자가 아닙니다.");
 
     private final int status;
     private final String message;
