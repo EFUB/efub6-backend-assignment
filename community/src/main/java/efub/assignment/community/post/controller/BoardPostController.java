@@ -18,7 +18,6 @@ public class BoardPostController {
     private final PostService postService;
 
     // 게시물 생성
-    @Transactional
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@PathVariable("boardId") Long boardId,
                                                    @RequestHeader("Auth-Id") Long memberId,
@@ -28,10 +27,9 @@ public class BoardPostController {
     }
 
     // 게시물 목록 조회
-    @Transactional
     @GetMapping
-    public ResponseEntity<PostListResponse> getAllPosts() {
-        PostListResponse response = postService.getAllPosts();
+    public ResponseEntity<PostListResponse> getAllPosts(@PathVariable("boardId") Long boardId) {
+        PostListResponse response = postService.getAllPosts(boardId);
         return ResponseEntity.ok(response);
     }
 }
