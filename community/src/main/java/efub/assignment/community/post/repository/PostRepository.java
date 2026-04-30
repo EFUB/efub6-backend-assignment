@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    // 게시글 전체 조회
+    // 게시글 전체 조회 -> boardId에 해당되는 게시판의 게시물만 불러오도록 수정 필요
     List<Post> findAllByOrderByCreatedAtDesc();
 }

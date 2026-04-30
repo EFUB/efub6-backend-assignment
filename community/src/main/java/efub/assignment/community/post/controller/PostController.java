@@ -17,7 +17,6 @@ public class PostController {
     private final PostService postService;
 
     // 게시물 상세 조회
-    @Transactional
     @GetMapping
     public ResponseEntity<PostResponse> getPost(@PathVariable("postId") Long postId) {
         PostResponse response = postService.getPost(postId);
@@ -25,7 +24,6 @@ public class PostController {
     }
 
     // 게시물 수정
-    @Transactional
     @PatchMapping
     public ResponseEntity<PostResponse> updatePostContent(@PathVariable("postId") Long postId,
                                                           @RequestHeader("Auth-Id") Long memberId,
@@ -35,7 +33,6 @@ public class PostController {
     }
 
     // 게시물 삭제
-    @Transactional
     @DeleteMapping
     public ResponseEntity<Void> deletePost(@PathVariable("postId") Long postId,
                                            @RequestHeader("Auth-Id") Long memberId) {

@@ -41,7 +41,7 @@ public class PostService {
 
     // 게시글 목록 조회
     @Transactional(readOnly = true)
-    public PostListResponse getAllPosts() {
+    public PostListResponse getAllPosts(Long boardId) {
         List<PostSummary> postSummaries = postRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(PostSummary::from)
@@ -86,7 +86,7 @@ public class PostService {
         }
     }
 
-    private Post findByPostId(Long postId) {
+    public Post findByPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
