@@ -1,7 +1,7 @@
 package efub.assignment.community.post.controller;
 
-import efub.assignment.community.post.dto.request.PostCreateRequest;
-import efub.assignment.community.post.dto.request.PostUpdateRequest;
+import efub.assignment.community.post.dto.request.CreatePostRequest;
+import efub.assignment.community.post.dto.request.UpdatePostRequest;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.service.PostService;
@@ -19,10 +19,9 @@ public class PostController {
 
     // 게시글 생성
     @PostMapping("/boards/{boardId}/posts")
-    public ResponseEntity<Void> createPost(
-            @PathVariable("boardId") Long boardId,
-            @RequestHeader("Auth-Id") Long memberId,
-            @Valid @RequestBody PostCreateRequest request) {
+    public ResponseEntity<Void> createPost(@PathVariable("boardId") Long boardId,
+                                           @RequestHeader("Auth-Id") Long memberId,
+                                           @Valid @RequestBody CreatePostRequest request) {
         Long postId = postService.createPost(boardId, memberId, request);
         return ResponseEntity.created(URI.create("/boards/"+boardId+"/posts/"+postId)).build();
     }
@@ -35,15 +34,15 @@ public class PostController {
 
     // 게시글 단건 내용 조회
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<PostResponse> getPost(@PathVariable("postId") Long id) {
-        return ResponseEntity.ok(postService.getPost(id));
+    public ResponseEntity<PostResponse> getPost(@PathVariable("postId") Long postId) {
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 
     // 게시글 수정
     @PatchMapping("/posts/{postId}")
     public ResponseEntity<Void> updatePostContent(@PathVariable("postId") Long postId,
                                                   @RequestHeader("Auth-Id") Long memberId,
-                                                  @RequestBody PostUpdateRequest request) {
+                                                  @RequestBody UpdatePostRequest request) {
         postService.updatePostContent(postId, request, memberId);
         return ResponseEntity.noContent().build();
     }

@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BoardCreateRequest {
-    @NotNull
-    private Long memberId;
+public class CreateBoardRequest {
 
     @NotBlank(message = "게시판 이름을 입력해야 합니다.")
     private String name;

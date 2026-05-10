@@ -5,10 +5,11 @@ import efub.assignment.community.board.repository.BoardRepository;
 import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
-import efub.assignment.community.member.service.MembersService;
+import efub.assignment.community.member.repository.MemberRepository;
+import efub.assignment.community.member.service.MemberService;
 import efub.assignment.community.post.domain.Post;
-import efub.assignment.community.post.dto.request.PostCreateRequest;
-import efub.assignment.community.post.dto.request.PostUpdateRequest;
+import efub.assignment.community.post.dto.request.CreatePostRequest;
+import efub.assignment.community.post.dto.request.UpdatePostRequest;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.dto.summary.PostSummary;
@@ -24,12 +25,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final MembersService membersService;
+    private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
 
     @Transactional
-    public Long createPost(Long boardId, Long memberId, @Valid PostCreateRequest request) {
-        Member writerMember = membersService.findByMemberId(memberId);
+    public Long createPost(Long boardId, Long memberId, @Valid CreatePostRequest request) {
+        Member writerMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
@@ -39,8 +41,8 @@ public class PostService {
         postRepository.save(newPost);
         return newPost.getId();
     }
-    
-    @Transactional
+
+    @Transactional(readOnly = true)
     public PostListResponse getAllPosts() {
         List<PostSummary> postSummaries = postRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
@@ -58,9 +60,10 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePostContent(Long postId, PostUpdateRequest request, Long memberId) {
+    public void updatePostContent(Long postId, UpdatePostRequest request, Long memberId) {
         Post post = findByPostId(postId);
-        Member member = membersService.findByMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         authorizePostWriter(post, member);
         post.changeContent(request.content());
@@ -69,20 +72,21 @@ public class PostService {
     @Transactional
     public void deletePost(Long postId, Long memberId) {
         Post post = findByPostId(postId);
-        Member member = membersService.findByMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         authorizePostWriter(post, member);
         postRepository.delete(post);
     }
 
-    public Post findByPostId(Long postId) {
+    private Post findByPostId(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(()->new CustomException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
 
     private void authorizePostWriter(Post post, Member member) {
         // 객체 자체가 아니라, 고유 식별자인 memberId(PK)를 비교
-        if(!post.getWriter().getMemberId().equals(member.getMemberId())) {
+        if (!post.getWriter().getMemberId().equals(member.getMemberId())) {
             throw new CustomException(ErrorCode.POST_ACCOUNT_MISMATCH);
         }
     }

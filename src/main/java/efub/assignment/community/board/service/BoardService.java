@@ -1,15 +1,15 @@
 package efub.assignment.community.board.service;
 
 import efub.assignment.community.board.domain.Board;
-import efub.assignment.community.board.dto.request.BoardCreateRequest;
-import efub.assignment.community.board.dto.request.BoardUpdateRequest;
+import efub.assignment.community.board.dto.request.CreateBoardRequest;
+import efub.assignment.community.board.dto.request.UpdateBoardRequest;
 import efub.assignment.community.board.dto.response.BoardResponse;
 import efub.assignment.community.board.repository.BoardRepository;
 import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
-import efub.assignment.community.member.service.MembersService;
-import jakarta.transaction.Transactional;
+import efub.assignment.community.member.repository.MemberRepository;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,28 +18,36 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-    private final MembersService membersService;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public Long createBoard(BoardCreateRequest request) {
-        Member writerAccount = membersService.findByMemberId(request.getMemberId());
+    public Long createBoard(Long memberId, CreateBoardRequest request) {
+        Member writerAccount = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         Board newBoard = request.toEntity(writerAccount);
+
         boardRepository.save(newBoard);
         return newBoard.getId();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public BoardResponse getBoard(Long boardId) {
         Board board = findByBoardId(boardId);
         return BoardResponse.from(board);
     }
 
     @Transactional
-    public void updateBoardOwner(Long boardId, Long memberId, @Valid BoardUpdateRequest request) {
+    public void updateBoardOwner(Long boardId, Long memberId, @Valid UpdateBoardRequest request) {
         Board board = findByBoardId(boardId);
-        Member currentOwner = membersService.findByMemberId(memberId); // 기존 주인
-        Member newOwner = membersService.findByNickname(request.nickname()); // 새 주인
+
+        // 기존 주인
+        Member currentOwner = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        // 새 주인
+        Member newOwner = memberRepository.findById(request.memberId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         authorizeBoardWriter(board, currentOwner);
         board.changeOwner(newOwner);
@@ -48,7 +56,8 @@ public class BoardService {
     @Transactional
     public void deleteBoard(Long boardId, Long memberId) {
         Board board = findByBoardId(boardId);
-        Member member = membersService.findByMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         authorizeBoardWriter(board, member);
         boardRepository.delete(board);
@@ -56,11 +65,11 @@ public class BoardService {
 
     private Board findByBoardId(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(()->new CustomException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
     }
 
     private void authorizeBoardWriter(Board board, Member member) {
-        if(!board.getWriter().getMemberId().equals(member.getMemberId())) {
+        if (!board.getWriter().getMemberId().equals(member.getMemberId())) {
             throw new CustomException(ErrorCode.BOARD_ACCOUNT_MISMATCH);
         }
     }

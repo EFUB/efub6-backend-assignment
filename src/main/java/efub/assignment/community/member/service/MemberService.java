@@ -11,11 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MembersService {
+public class MemberService {
 
     private final MemberRepository membersRepository;
 
     // 멤버 단건 조회
+    @Transactional(readOnly = true)
     public MemberResponseDto getMember(Long memberId){
         Member member = membersRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다."));
@@ -39,8 +40,7 @@ public class MembersService {
         Member member = membersRepository.findByMemberId(memberId)
                 .orElseThrow(()->new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
         member.updateNickname(requestDto.getNickname());
-        Member updatedMember = membersRepository.save(member);
-        return MemberResponseDto.from(updatedMember);
+        return MemberResponseDto.from(member);
     }
 
     // 멤버 논리적 삭제 (status 변경)
@@ -49,7 +49,6 @@ public class MembersService {
         Member member = membersRepository.findByMemberId(memberId)
                 .orElseThrow(()->new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
         member.changeStatus(MemberStatus.UNREGISTER);
-        membersRepository.save(member);
     }
 
     // 멤버 찾아주는 도우미 메서드 추가

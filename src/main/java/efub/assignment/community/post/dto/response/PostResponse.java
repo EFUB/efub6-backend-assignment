@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record PostResponse(
         Long postId,
-        Long accountId,
+        Long memberId,
         String nickName,
         String title,
         String content,
@@ -18,7 +18,7 @@ public record PostResponse(
     public static PostResponse from(Post post) {
         return new PostResponse(
                 post.getId(),
-                post.getWriter().getMemberId(),
+                post.isAnonymous() ? null : post.getWriter().getMemberId(),
                 post.isAnonymous() ? "익명" : post.getWriter().getNickname(),
                 post.getTitle(),
                 post.getContent(),

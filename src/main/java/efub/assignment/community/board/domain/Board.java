@@ -13,11 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 게시판 주인 닉네임
+    // 게시판 주인
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id", nullable = false)
     private Member writer;
 
     // 게시판 이름
@@ -25,11 +26,11 @@ public class Board extends BaseEntity {
     private String name;
 
     // 게시판 설명
-    @Column(nullable = true)
+    @Column(nullable = true, length = 1000)
     private String description;
 
     // 게시판 공지
-    @Column(nullable = true)
+    @Column(nullable = true, length = 1000)
     private String notification;
 
     @Builder

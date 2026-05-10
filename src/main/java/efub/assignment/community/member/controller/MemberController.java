@@ -1,14 +1,10 @@
 package efub.assignment.community.member.controller;
 
-import efub.assignment.community.member.domain.Member;
-import efub.assignment.community.member.domain.MemberStatus;
 import efub.assignment.community.member.dto.CreateMemberRequestDto;
 import efub.assignment.community.member.dto.MemberResponseDto;
 import efub.assignment.community.member.dto.UpdateMemberRequestDto;
-import efub.assignment.community.member.repository.MemberRepository;
-import efub.assignment.community.member.service.MembersService;
+import efub.assignment.community.member.service.MemberService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/members")
 public class MemberController {
 
-    private final MembersService membersService;
+    private final MemberService membersService;
 
     // 생성자 주입 (DI)
-    public MemberController(MembersService membersService) {
+    public MemberController(MemberService membersService) {
         this.membersService = membersService;
     }
 
