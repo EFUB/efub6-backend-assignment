@@ -6,8 +6,7 @@ import efub.assignment.community.member.dto.CreateMemberRequestDto;
 import efub.assignment.community.member.dto.MemberResponseDto;
 import efub.assignment.community.member.dto.UpdateMemberRequestDto;
 import efub.assignment.community.member.repository.MemberRepository;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,5 +50,18 @@ public class MembersService {
                 .orElseThrow(()->new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
         member.changeStatus(MemberStatus.UNREGISTER);
         membersRepository.save(member);
+    }
+
+    // 멤버 찾아주는 도우미 메서드 추가
+    @Transactional(readOnly = true)
+    public Member findByMemberId(Long memberId) {
+        return membersRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public Member findByNickname(String nickname) {
+        return membersRepository.findByNickname(nickname)
+                .orElseThrow(() -> new IllegalArgumentException("해당 닉네임을 가진 회원을 찾을 수 없습니다. 닉네임: " + nickname));
     }
 }
