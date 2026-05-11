@@ -5,21 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
-public class CreateMemberRequestDto {
-    @NotBlank
-    private String studentId;
-    @NotBlank
-    private String university;
-    @NotBlank
-    private String nickname;
-    @NotBlank
-    private String email;
-    @NotBlank
-    private String password;
+public record CreateMemberRequestDto(
+        String studentId,
+        String university,
+        String nickname,
+        String email,
+        String password
+) {
 
-    public Member toEntity(){
+    public Member toEntity() {
         return Member.builder()
                 .studentId(studentId)
                 .university(university)
