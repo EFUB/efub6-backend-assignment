@@ -12,7 +12,6 @@ import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.repository.PostRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long createComment(Long postId, Long memberId, @Valid CreateCommentRequest request) {
+    public Long createComment(Long postId, Long memberId, CreateCommentRequest request) {
         Member writerMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
 
@@ -84,6 +83,16 @@ public class CommentService {
 
         authorizeCommentWriter(comment, member);
         comment.changeContent(request.content());
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        authorizeCommentWriter(comment, member);
+        commentRepository.delete(comment);
     }
 
     private Comment findByCommentId(Long commentId) {

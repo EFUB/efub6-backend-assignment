@@ -13,7 +13,8 @@ public record PostResponse(
         boolean isAnonymous,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt,
-        Long viewCount
+        Long viewCount,
+        Long likeCount
 ) {
     public static PostResponse from(Post post) {
         return new PostResponse(
@@ -25,7 +26,8 @@ public record PostResponse(
                 post.isAnonymous(), // boolean은 앞에 is를 붙여야 함.
                 post.getCreatedAt(),
                 post.getModifiedAt(),
-                post.getViewCount()
+                post.getViewCount(),
+                post.getLikeCount()
         );
     }
 }

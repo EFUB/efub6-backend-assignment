@@ -7,6 +7,8 @@ import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +55,21 @@ public class PostController {
                                            @RequestHeader("Auth-Id") Long memberId) {
         postService.deletePost(postId, memberId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 좋아요 생성
+    @PostMapping("/posts/{postId}/like")
+    public ResponseEntity<PostResponse> likePost(@PathVariable("postId") Long postId,
+                                           @RequestHeader("Auth-Id") Long memberId) {
+        PostResponse response = postService.likePost(postId, memberId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 게시글 좋아요 삭제
+    @DeleteMapping("/posts/{postId}/like")
+    public ResponseEntity<PostResponse> unlikePost(@PathVariable("postId") Long postId,
+                                             @RequestHeader("Auth-Id") Long memberId) {
+        PostResponse response = postService.unlikePost(postId, memberId);
+        return ResponseEntity.ok(response);
     }
 }

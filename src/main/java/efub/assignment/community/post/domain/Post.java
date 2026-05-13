@@ -38,6 +38,9 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private Long viewCount;
 
+    @Column(nullable = false)
+    private Long likeCount;
+
     @Builder
     public Post(Board board, Member writer, String title, String content, boolean isAnonymous) {
         this.board = board;
@@ -46,9 +49,20 @@ public class Post extends BaseEntity {
         this.content = content;
         this.isAnonymous = isAnonymous;
         this.viewCount = 0L;
+        this.likeCount = 0L;
     }
 
     public void changeContent(String newContent) {
         this.content = newContent;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if(this.likeCount > 0) { // 음수가 되면 안되니까,,
+            this.likeCount--;
+        }
     }
 }
