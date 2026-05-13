@@ -19,7 +19,12 @@ public enum ErrorCode {
 
     // board
     BOARD_NOT_FOUND(404, "해당 id의 게시판이 존재하지 않습니다."),
-    BOARD_ACCOUNT_MISMATCH(401, "게시판 주인이 아닙니다.");
+    BOARD_ACCOUNT_MISMATCH(401, "게시판 주인이 아닙니다."),
+
+    // comment
+    COMMENT_NOT_FOUND(404, "해당 id의 댓글이 존재하지 않습니다."),
+    COMMENT_ACCOUNT_MISMATCH(401, "댓글 주인이 아닙니다.");
+
 
     private final int status;
     private final String message;

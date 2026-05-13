@@ -1,5 +1,6 @@
 package efub.assignment.community.member.domain;
 
+import efub.assignment.community.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,8 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
@@ -46,15 +46,6 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus status = MemberStatus.REGISTER;
 
-    // 멤버 생성일자
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    // 멤버 수정일자
-    @LastModifiedDate
-    @Column(nullable = true)
-    private LocalDateTime modifiedAt;
 
     @Builder
     public Member(String email, String password, String nickname, String school, String studentId) {
@@ -63,7 +54,6 @@ public class Member {
         this.nickname = nickname;
         this.school = school;
         this.studentId = studentId;
-        this.createdAt = LocalDateTime.now();
     }
 
     public void changeStatus(MemberStatus status) {
