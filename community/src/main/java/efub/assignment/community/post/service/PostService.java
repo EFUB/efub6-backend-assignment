@@ -7,13 +7,14 @@ import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.service.MemberService;
 import efub.assignment.community.post.domain.Post;
+import efub.assignment.community.post.domain.PostLike;
 import efub.assignment.community.post.dto.request.PostCreateRequestDto;
 import efub.assignment.community.post.dto.request.PostUpdateRequestDto;
 import efub.assignment.community.post.dto.response.PostListResponseDto;
 import efub.assignment.community.post.dto.response.PostResponseDto;
+import efub.assignment.community.post.repositoriy.PostLikeRepository;
 import efub.assignment.community.post.repositoriy.PostRepository;
 import efub.assignment.community.post.summary.PostSummary;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,8 @@ public class PostService {
     private final MemberService memberService;
     private final BoardService boardService;
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
+
     @Transactional
     public Long createPost(PostCreateRequestDto request) {
         Board board = boardService.findByBoardId(request.getBoardId());
@@ -74,6 +77,33 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional
+    public void likePost (Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+        Member member = memberService.findByMemberId(memberId);
+
+        if(postLikeRepository.existsByPostAndMember(post, member)) {
+            throw new CustomException(ErrorCode.LIKE_ALREADY_EXISTS);
+        }
+
+        PostLike like = PostLike.builder()
+                .post(post)
+                .member(member)
+                .build();
+
+        postLikeRepository.save(like);
+    }
+
+    @Transactional
+    public void unlikePost (Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+        Member member = memberService.findByMemberId(memberId);
+
+        PostLike like = postLikeRepository.findByPostAndMember(post, member)
+                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+        postLikeRepository.delete(like);
+    }
+
     public Post findByPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
@@ -84,6 +114,7 @@ public class PostService {
             throw new CustomException(ErrorCode.POST_ACCOUNT_MISMATCH);
         }
     }
+
 }
 
 

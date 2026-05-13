@@ -1,8 +1,10 @@
 package efub.assignment.community.comment.service;
 
 import efub.assignment.community.comment.domain.Comment;
+import efub.assignment.community.comment.domain.CommentLike;
 import efub.assignment.community.comment.dto.request.CommentRequest;
 import efub.assignment.community.comment.dto.request.CommentUpdateRequest;
+import efub.assignment.community.comment.repository.CommentLikeRepository;
 import efub.assignment.community.comment.repository.CommentRepository;
 import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
@@ -25,6 +27,7 @@ public class CommentService {
     private final MemberService memberService;
     private final PostService postService;
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // [댓글 생성]
     @Transactional
@@ -66,14 +69,53 @@ public class CommentService {
         comment.updateContent(request.getContent());
     }
 
-    public void authorizeCommentOwner(Member member, Comment comment) {
-        if (!comment.getWriter().equals(member)) {
-            throw new CustomException(ErrorCode.COMMENT_ACCOUNT_MISMATCH);
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberService.findByMemberId(memberId);
+
+        authorizeCommentOwner(member, comment);
+
+        commentRepository.delete(comment);
+    }
+
+    @Transactional
+    public void likeComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberService.findByMemberId(memberId);
+
+        if (commentLikeRepository.existsByCommentAndMember(comment, member)){
+            throw new CustomException(ErrorCode.LIKE_ALREADY_EXISTS);
         }
+
+        CommentLike like = CommentLike.builder()
+                .comment(comment)
+                .member(member)
+                .build();
+
+        commentLikeRepository.save(like);
+    }
+
+    @Transactional
+    public void unlikeComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberService.findByMemberId(memberId);
+
+        CommentLike like = commentLikeRepository.findByCommentAndMember(comment, member)
+                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+
+        commentLikeRepository.delete(like);
     }
 
     public Comment findByCommentId(Long commentId) {
         return commentRepository.findByCommentId(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
     }
+
+    public void authorizeCommentOwner(Member member, Comment comment) {
+        if (!comment.getWriter().equals(member)) {
+            throw new CustomException(ErrorCode.COMMENT_ACCOUNT_MISMATCH);
+        }
+    }
+
 }

@@ -21,7 +21,9 @@ public enum ErrorCode {
     BOARD_NOT_FOUND(404, "해당 id의 게시판이 존재하지 않습니다."),
     BOARD_ACCOUNT_MISTMATCH(401, "게시판 주인이 아닙니다."),
     COMMENT_NOT_FOUND(404, "해당 id의 댓글이 존재하지 않습니다."),
-    COMMENT_ACCOUNT_MISMATCH(401, "댓글의 주인이 아닙니다");
+    COMMENT_ACCOUNT_MISMATCH(401, "댓글의 주인이 아닙니다"),
+    LIKE_ALREADY_EXISTS(400, "좋아요가 이미 존재합니다."),
+    LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다.");
 
     private final int status;
     private final String message;
