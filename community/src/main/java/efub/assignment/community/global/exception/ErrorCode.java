@@ -22,7 +22,10 @@ public enum ErrorCode {
 
     // POST
     POST_NOT_FOUND(404, "해당 id의 게시글이 존재하지 않습니다."),
-    POST_MEMBER_MISMATCH(403, "게시글 작성자가 아닙니다.");
+    POST_MEMBER_MISMATCH(403, "게시글 작성자가 아닙니다."),
+
+    // Comment
+    COMMENT_NOT_FOUND(404, "해당 id의 댓글이 존재하지 않습니다.");
 
     private final int status;
     private final String message;
