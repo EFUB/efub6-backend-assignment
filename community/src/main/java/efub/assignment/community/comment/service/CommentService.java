@@ -64,6 +64,16 @@ public class CommentService {
         comment.changeContent(request.getContent());
     }
 
+    // 댓글 삭제
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberService.findByMemberId(memberId);
+        authorizeCommentWriter(comment, member);
+
+        commentRepository.delete(comment);
+    }
+
     private void authorizeCommentWriter(Comment comment, Member member) {
         if(!comment.getWriter().equals(member)) {
             throw new CustomException(ErrorCode.COMMENT_ACCOUNT_MISMATCH);
