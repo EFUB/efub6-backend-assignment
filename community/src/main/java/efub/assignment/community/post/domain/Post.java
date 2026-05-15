@@ -19,7 +19,7 @@ public class Post extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable=false)
     private Member author;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

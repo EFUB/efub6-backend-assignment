@@ -85,7 +85,7 @@ public class PostService {
     }
 
     private void authorizePostAuthor(Post post, Member member) {
-        if (!post.getAuthor().equals(member)) {
+        if (!post.getAuthor().getMemberId().equals(member.getMemberId())) {
             throw new CustomException(ErrorCode.POST_MEMBER_MISMATCH);
         }
     }

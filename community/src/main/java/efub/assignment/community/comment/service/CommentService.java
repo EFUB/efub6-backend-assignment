@@ -30,9 +30,9 @@ public class CommentService {
         Post post = postService.findByPostId(postId);
 
         Comment comment = request.toEntity(writer, post);
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
-        return CommentResponse.of(comment);
+        return CommentResponse.of(savedComment);
     }
 
     public CommentResponse updateComment(Long commentId, CommentRequest request) {

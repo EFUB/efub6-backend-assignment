@@ -15,6 +15,7 @@ public class PostCreateRequest {
     @NotNull(message = "익명 여부는 필수입니다.")
     private Boolean isAnonymous;
 
+    @NotNull(message = "게시글 내용은 필수입니다.")
     @Size(min = 5, max = 500, message = "내용은 5자 이상 500자 이하로 입력해야 합니다.")
     private String content;
 
