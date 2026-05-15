@@ -24,4 +24,12 @@ public class CommentController {
 
         return ResponseEntity.ok(response);
     }
+
+    //댓글 삭제
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("commentId") Long commentId,
+                                              @RequestHeader("Auth-id") Long memberId){
+       commentService.deleteComment(commentId, memberId);
+       return ResponseEntity.noContent().build();
+    }
 }
