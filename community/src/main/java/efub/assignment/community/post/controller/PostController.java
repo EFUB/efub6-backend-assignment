@@ -2,6 +2,7 @@ package efub.assignment.community.post.controller;
 
 import efub.assignment.community.post.dto.request.PostCreateRequest;
 import efub.assignment.community.post.dto.request.PostUpdateRequest;
+import efub.assignment.community.post.dto.response.PostLikeResponse;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.service.PostService;
@@ -63,6 +64,31 @@ public class PostController {
             @RequestHeader("Auth-id") Long memberId
     ) {
         postService.deletePost(postId, memberId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    //게시글 좋아요
+    @PostMapping("/posts/{postId}/likes")
+    public ResponseEntity<PostLikeResponse> likePost(
+            @PathVariable Long postId,
+            @RequestHeader("Auth-id") Long memberId
+    ) {
+        PostLikeResponse response = postService.likePost(postId, memberId);
+
+        return ResponseEntity
+                .created(URI.create("/posts/" + postId + "/likes"))
+                .body(response);
+    }
+
+    //게시글 좋아요 취소
+    @DeleteMapping("/posts/{postId}/likes")
+    public ResponseEntity<Void> unlikePost(
+            @PathVariable Long postId,
+            @RequestHeader("Auth-id") Long memberId
+    ) {
+        postService.unlikePost(postId, memberId);
+
         return ResponseEntity.noContent().build();
     }
 }
