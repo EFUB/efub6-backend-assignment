@@ -16,6 +16,8 @@ public enum ErrorCode {
     // post
     POST_NOT_FOUND(404, "해당 id의 게시물이 존재하지 않습니다."),
     POST_ACCOUNT_MISMATCH(401, "게시글 생성자가 아닙니다."),
+    POST_LIKE_NOT_FOUND(404, "게시글 좋아요가 존재하지 않습니다."),
+    POST_LIKE_ALREADY_EXISTS(400, "게시글 좋아요가 이미 존재합니다."),
 
     // board
     BOARD_NOT_FOUND(404, "해당 id의 게시판이 존재하지 않습니다."),
