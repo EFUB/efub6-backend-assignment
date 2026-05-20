@@ -1,6 +1,7 @@
 package efub.assignment.community.post.domain;
 
 import efub.assignment.community.board.domain.Board;
+import efub.assignment.community.comment.domain.Comment;
 import efub.assignment.community.global.domain.BaseEntity;
 import efub.assignment.community.member.domain.Member;
 import jakarta.persistence.*;
@@ -8,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +44,9 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private Long likeCount;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Post(Board board, Member writer, String title, String content, boolean isAnonymous) {

@@ -62,14 +62,14 @@ public class PostController {
     public ResponseEntity<PostResponse> likePost(@PathVariable("postId") Long postId,
                                            @RequestHeader("Auth-Id") Long memberId) {
         PostResponse response = postService.likePost(postId, memberId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 게시글 좋아요 삭제
     @DeleteMapping("/posts/{postId}/like")
-    public ResponseEntity<PostResponse> unlikePost(@PathVariable("postId") Long postId,
+    public ResponseEntity<Void> unlikePost(@PathVariable("postId") Long postId,
                                              @RequestHeader("Auth-Id") Long memberId) {
-        PostResponse response = postService.unlikePost(postId, memberId);
-        return ResponseEntity.ok(response);
+        postService.unlikePost(postId, memberId);
+        return ResponseEntity.noContent().build();
     }
 }
