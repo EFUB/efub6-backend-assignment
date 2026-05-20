@@ -1,4 +1,4 @@
-package efub.assignment.community.member.controller;
+package efub.assignment.community.comment.controller;
 
 import efub.assignment.community.comment.service.CommentService;
 import efub.assignment.community.member.dto.response.MemberCommentResponse;

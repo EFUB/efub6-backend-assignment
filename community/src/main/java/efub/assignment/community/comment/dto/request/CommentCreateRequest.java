@@ -12,7 +12,6 @@ import lombok.*;
 public class CommentCreateRequest {
 
     // comment 생성 시 작성자ID, content 전달받기
-    private Long memberId;
     private String content;
 
     // member와 post에서 가져와 사용

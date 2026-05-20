@@ -29,8 +29,7 @@ public class CommentService {
 
     // 댓글 생성
     @Transactional
-    public Long createComment(Long postId, CommentCreateRequest request) {
-        Long memberId = request.getMemberId();
+    public Long createComment(Long postId, CommentCreateRequest request, Long memberId) {
         Member writer = memberService.findByMemberId(memberId);
         Post post = postService.findByPostId(postId);
 
@@ -41,8 +40,9 @@ public class CommentService {
     }
 
     // 특정 게시물 댓글 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public PostCommentResponse getPostCommentList(Long postId) {
+        postService.findByPostId(postId);  // 게시글이 있는지 먼저 확인
         List<Comment> commentList = commentRepository.findAllByPostIdOrderByCreatedAtDesc(postId);
         return PostCommentResponse.of(postId, commentList);
     }
@@ -61,7 +61,17 @@ public class CommentService {
         Member member = memberService.findByMemberId(memberId);
 
         authorizeCommentWriter(comment, member);
-        comment.changeContent(request.content());
+        comment.changeContent(request.getContent());
+    }
+
+    // 댓글 삭제
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberService.findByMemberId(memberId);
+        authorizeCommentWriter(comment, member);
+
+        commentRepository.delete(comment);
     }
 
     private void authorizeCommentWriter(Comment comment, Member member) {

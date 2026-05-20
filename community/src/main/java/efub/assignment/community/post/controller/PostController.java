@@ -1,10 +1,13 @@
 package efub.assignment.community.post.controller;
 
+import efub.assignment.community.member.domain.Member;
+import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.dto.request.PostUpdateRequest;
 import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +40,22 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable("postId") Long postId,
                                            @RequestHeader("Auth-Id") Long memberId) {
         postService.deletePost(postId, memberId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 게시물 좋아요 생성
+    @PostMapping("/like")
+    public ResponseEntity<String> likePost(@PathVariable("postId") Long postId,
+                                           @RequestHeader("Auth-Id") Long memberId) {
+        postService.createPostLike(postId, memberId);
+        return ResponseEntity.status(HttpStatus.CREATED).body("좋아요가 생성되었습니다.");
+    }
+
+    // 게시물 좋아요 삭제
+    @DeleteMapping("/like")
+    public ResponseEntity<Void> unlikePost(@PathVariable("postId") Long postId,
+                                             @RequestHeader("Auth-Id") Long memberId) {
+        postService.deletePostLike(postId, memberId);
         return ResponseEntity.noContent().build();
     }
 }
