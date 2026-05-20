@@ -42,23 +42,34 @@ public class BoardService {
         return BoardResponseDto.from(board);
     }
 
-    public BoardResponseDto updateBoard(Long boardId, UpdateBoardRequestDto requestDto) {
+    public BoardResponseDto updateBoard(Long boardId, Long memberId, UpdateBoardRequestDto requestDto){
         Board board = findByBoardId(boardId);
+        authorizeBoardOwner(board, memberId);
+
         board.updateBoardInfo(
                 requestDto.boardName(),
                 requestDto.description(),
                 requestDto.notice()
         );
+
         return BoardResponseDto.from(board);
     }
 
-    public void deleteBoard(Long boardId) {
+    public void deleteBoard(Long boardId, Long memberId) {
         Board board = findByBoardId(boardId);
+        authorizeBoardOwner(board, memberId);
+
         boardRepository.delete(board);
     }
 
     public Board findByBoardId(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+    }
+
+    private void authorizeBoardOwner(Board board, Long memberId) {
+        if (!board.getMember().getMemberId().equals(memberId)) {
+            throw new CustomException(ErrorCode.BOARD_MEMBER_MISMATCH);
+        }
     }
 }

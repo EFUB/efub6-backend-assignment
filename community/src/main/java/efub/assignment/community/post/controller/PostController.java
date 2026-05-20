@@ -56,4 +56,22 @@ public class PostController {
         response.put("message", "성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/posts/{postId}/like")
+    public ResponseEntity<String> likePost(
+            @PathVariable("postId") Long postId,
+            @RequestHeader("Auth-Id") Long memberId
+    ) {
+        postService.likePost(postId, memberId);
+        return ResponseEntity.status(HttpStatus.CREATED).body("좋아요를 눌렀습니다.");
+    }
+
+    @DeleteMapping("/posts/{postId}/like")
+    public ResponseEntity<String> unlikePost(
+            @PathVariable("postId") Long postId,
+            @RequestHeader("Auth-Id") Long memberId
+    ) {
+        postService.unlikePost(postId, memberId);
+        return ResponseEntity.ok("좋아요가 취소되었습니다.");
+    }
 }

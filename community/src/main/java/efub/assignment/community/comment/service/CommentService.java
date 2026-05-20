@@ -64,16 +64,20 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public CommentResponseDto updateComment(Long commentId, UpdateCommentRequestDto requestDto) {
+    public CommentResponseDto updateComment(Long commentId, Long memberId, UpdateCommentRequestDto requestDto) {
         Comment comment = findByCommentId(commentId);
+        authorizeCommentWriter(comment, memberId);
+
         comment.updateContent(requestDto.content());
 
         return CommentResponseDto.from(comment);
     }
 
     // 댓글 삭제
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long commentId, Long memberId) {
         Comment comment = findByCommentId(commentId);
+        authorizeCommentWriter(comment, memberId);
+
         commentRepository.delete(comment);
     }
 
@@ -81,5 +85,10 @@ public class CommentService {
     public Comment findByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+    }
+    private void authorizeCommentWriter(Comment comment, Long memberId) {
+        if (!comment.getWriter().getMemberId().equals(memberId)) {
+            throw new CustomException(ErrorCode.COMMENT_MEMBER_MISMATCH);
+        }
     }
 }

@@ -46,6 +46,9 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private Long viewCount;
 
+    @Column(nullable = false)
+    private Long likeCount;
+
     @Builder
     public Post(Board board, Member member, String title, Boolean anonymous, String content) {
         this.board = board;
@@ -54,10 +57,19 @@ public class Post extends BaseEntity {
         this.anonymous = anonymous;
         this.content = content;
         this.viewCount = 0L;
+        this.likeCount = 0L;
     }
 
     public void updatePost(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
     }
 }

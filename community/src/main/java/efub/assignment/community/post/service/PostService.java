@@ -7,11 +7,13 @@ import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.post.domain.Post;
+import efub.assignment.community.post.domain.PostLike;
 import efub.assignment.community.post.dto.request.CreatePostRequestDto;
 import efub.assignment.community.post.dto.request.UpdatePostRequestDto;
 import efub.assignment.community.post.dto.response.PostListResponseDto;
 import efub.assignment.community.post.dto.response.PostResponseDto;
 import efub.assignment.community.post.dto.summary.PostSummaryDto;
+import efub.assignment.community.post.repository.PostLikeRepository;
 import efub.assignment.community.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final PostLikeRepository postLikeRepository;
 
     // 게시글 생성
     public PostResponseDto createPost(Long boardId, Long memberId, CreatePostRequestDto requestDto) {
@@ -67,12 +70,14 @@ public class PostService {
         return new PostListResponseDto(posts, totalPosts);
     }
 
-    // 게시글 상세 조회 (조회수 증가 포함)
+    // 게시글 상세 조회
     public PostResponseDto getPost(Long postId) {
+        // 존재 여부 먼저 확인
+        Post post = findByPostId(postId);
         // 조회수 증가
         postRepository.increaseViewCount(postId);
-        // 최신 데이터 조회
-        Post post = findByPostId(postId);
+        // 최신 조회수 반영
+        post = findByPostId(postId);
         return PostResponseDto.from(post);
     }
 
@@ -93,6 +98,44 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         authorizePostWriter(post, member);
         postRepository.delete(post);
+    }
+
+    // 게시글 좋아요 생성
+    public void likePost(Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (postLikeRepository.existsByPostAndMember(post, member)) {
+            throw new CustomException(ErrorCode.POST_LIKE_ALREADY_EXISTS);
+        }
+
+        PostLike postLike = PostLike.builder()
+                .post(post)
+                .member(member)
+                .build();
+
+        postLikeRepository.save(postLike);
+
+        // 좋아요 수 증가
+        post.increaseLikeCount();
+    }
+
+    // 게시글 좋아요 삭제
+    public void unlikePost(Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        PostLike postLike = postLikeRepository.findByPostAndMember(post, member)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_LIKE_NOT_FOUND));
+
+        postLikeRepository.delete(postLike);
+
+        // 좋아요 수 감소
+        post.decreaseLikeCount();
     }
 
     // helpers

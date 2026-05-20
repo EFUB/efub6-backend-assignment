@@ -8,14 +8,16 @@ public record PostSummaryDto(
         Long postId,
         String title,
         Boolean anonymous,
-        Long viewCount
+        Long viewCount,
+        Long likeCount
 ) {
     public static PostSummaryDto from(Post post) {
         return new PostSummaryDto(
                 post.getPostId(),
                 post.getTitle(),
                 post.getAnonymous(),
-                post.getViewCount()
-       );
+                post.getViewCount(),
+                post.getLikeCount()
+                );
     }
 }

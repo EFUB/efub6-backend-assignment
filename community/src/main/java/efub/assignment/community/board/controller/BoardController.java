@@ -33,15 +33,22 @@ public class BoardController {
     }
 
     @PatchMapping("/{boardId}")
-    public ResponseEntity<BoardResponseDto> updateBoard(@PathVariable("boardId") Long boardId,
-                                                        @RequestBody @Valid UpdateBoardRequestDto requestDto) {
-        BoardResponseDto responseDto = boardService.updateBoard(boardId, requestDto);
+    public ResponseEntity<BoardResponseDto> updateBoard(
+            @PathVariable("boardId") Long boardId,
+            @RequestHeader("Auth-Id") Long memberId,
+            @RequestBody @Valid UpdateBoardRequestDto requestDto
+    ) {
+        BoardResponseDto responseDto = boardService.updateBoard(boardId, memberId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<Map<String, String>> deleteBoard(@PathVariable("boardId") Long boardId) {
-        boardService.deleteBoard(boardId);
+    public ResponseEntity<Map<String, String>> deleteBoard(
+            @PathVariable("boardId") Long boardId,
+            @RequestHeader("Auth-Id") Long memberId
+    ) {
+        boardService.deleteBoard(boardId, memberId);
+
         Map<String, String> response = new HashMap<>();
         response.put("message", "성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(response);

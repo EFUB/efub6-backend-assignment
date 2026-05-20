@@ -12,6 +12,7 @@ public record PostResponseDto(
         Boolean anonymous,
         String content,
         Long viewCount,
+        Long likeCount,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
@@ -28,6 +29,7 @@ public record PostResponseDto(
                 post.getAnonymous(),
                 post.getContent(),
                 post.getViewCount(),
+                post.getLikeCount(),
                 post.getCreatedAt(),
                 post.getModifiedAt()
         );
