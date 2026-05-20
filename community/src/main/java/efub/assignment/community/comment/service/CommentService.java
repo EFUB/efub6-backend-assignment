@@ -3,6 +3,8 @@ package efub.assignment.community.comment.service;
 import efub.assignment.community.comment.domain.Comment;
 import efub.assignment.community.comment.dto.request.CommentRequest;
 import efub.assignment.community.comment.dto.response.CommentResponse;
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.dto.response.MemberCommentResponse;
 import efub.assignment.community.post.dto.response.PostCommentResponse;
 import efub.assignment.community.comment.repository.CommentRepository;
@@ -30,9 +32,9 @@ public class CommentService {
         Post post = postService.findByPostId(postId);
 
         Comment comment = request.toEntity(writer, post);
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
-        return CommentResponse.of(comment);
+        return CommentResponse.of(savedComment);
     }
 
     public CommentResponse updateComment(Long commentId, CommentRequest request) {
@@ -61,9 +63,24 @@ public class CommentService {
         return MemberCommentResponse.of(member, commentList);
     }
 
-    @Transactional(readOnly = true)
-    public Comment findByCommentId(Long commentId) {
+
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        Comment comment = findByCommentId(commentId);
+        Member member = memberService.findByMemberId(memberId);
+        authorizeCommentWriter(comment, member);
+        commentRepository.delete(comment);
+    }
+
+    private Comment findByCommentId(Long commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    private void authorizeCommentWriter(Comment comment,Member member){
+        if(!comment.getWriter().equals(member)){
+            throw new CustomException(ErrorCode.COMMENT_ACCOUNT_MISMATCH);
+        }
     }
 }
+

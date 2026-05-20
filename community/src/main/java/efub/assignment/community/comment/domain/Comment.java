@@ -22,7 +22,7 @@ public class Comment extends BaseEntity {
     @Column(nullable=false)
     private Boolean isAnonymous;
 
-    @Column(length=1000)
+    @Column(nullable = false, length=1000)
     private String content;
 
     // 연관관계

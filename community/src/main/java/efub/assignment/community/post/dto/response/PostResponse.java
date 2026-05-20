@@ -16,7 +16,7 @@ public record PostResponse(
         return new PostResponse(
                 post.getId(),
                 new AuthorInfo(
-                        post.getAuthor().getMemberId(),
+                        post.getAuthor().getMemberId(), //TODO: 추후 익명 처리 // anonymous ? null : post.getAuthor().getMemberId()
                         post.getIsAnonymous() ? "익명" : post.getAuthor().getNickname(),
                         post.getIsAnonymous()
                 ),
@@ -31,7 +31,7 @@ public record PostResponse(
     }
 
     public record AuthorInfo(
-            Long memberId,
+            Long memberId, //TODO: 추후 익명처리!!
             String authorNickname,
             Boolean isAnonymous
     ) {

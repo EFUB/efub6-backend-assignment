@@ -7,11 +7,14 @@ import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.service.MemberService;
 import efub.assignment.community.post.domain.Post;
+import efub.assignment.community.post.domain.PostLike;
 import efub.assignment.community.post.dto.request.PostCreateRequest;
 import efub.assignment.community.post.dto.request.PostUpdateRequest;
+import efub.assignment.community.post.dto.response.PostLikeResponse;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.dto.summary.PostSummary;
+import efub.assignment.community.post.repository.PostLikeRepository;
 import efub.assignment.community.post.repository.PostRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class PostService {
     private final MemberService memberService;
     private final BoardService boardService;
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional
     public PostResponse createPost(Long boardId, Long memberId, @Valid PostCreateRequest request) {
@@ -79,13 +83,45 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    //게시글 좋아요
+    @Transactional
+    public PostLikeResponse likePost(Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+        Member member = memberService.findByMemberId(memberId);
+
+        if (postLikeRepository.existsByPostAndMember(post, member)) {
+            throw new CustomException(ErrorCode.LIKE_ALREADY_EXISTS);
+        }
+
+        PostLike like = PostLike.builder()
+                .post(post)
+                .member(member)
+                .build();
+
+        PostLike savedLike = postLikeRepository.save(like);
+
+        return PostLikeResponse.from(savedLike);
+    }
+
+    //게시글 좋아요 취소
+    @Transactional
+    public void unlikePost(Long postId, Long memberId) {
+        Post post = findByPostId(postId);
+        Member member = memberService.findByMemberId(memberId);
+
+        PostLike like = postLikeRepository.findByPostAndMember(post, member)
+                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+
+        postLikeRepository.delete(like);
+    }
+
     public Post findByPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
 
     private void authorizePostAuthor(Post post, Member member) {
-        if (!post.getAuthor().equals(member)) {
+        if (!post.getAuthor().getMemberId().equals(member.getMemberId())) {
             throw new CustomException(ErrorCode.POST_MEMBER_MISMATCH);
         }
     }

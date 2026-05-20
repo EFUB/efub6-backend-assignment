@@ -1,6 +1,7 @@
 package efub.assignment.community.member.domain;
 
 
+import efub.assignment.community.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name= "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -52,16 +53,6 @@ public class Member {
         this.password = password;
     }
 
-    //생성일, 수정일 자동으로 들어가도록 함
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     //수정: 닉네임(선택), 이메일(선택), 비밀번호(필수)
     public void updateMember(String nickname, String email, String password){

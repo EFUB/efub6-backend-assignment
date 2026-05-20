@@ -19,7 +19,16 @@ public enum ErrorCode {
 
     //board
     BOARD_NOT_FOUND(404, "존재하지 않는 게시판입니다. "),
-    BOARD_ACCESS_DENIED(403, "권한이 없습니다.");
+    BOARD_ACCESS_DENIED(403, "권한이 없습니다."),
+
+    // comment
+    COMMENT_NOT_FOUND(404, "댓글이 존재하지 않습니다."),
+    COMMENT_ACCOUNT_MISMATCH(400, "댓글 작성자와 현재 로그인된 사용자가 일치하지 않습니다."),
+
+    //like
+    LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다."),
+    LIKE_ALREADY_EXISTS(400, "좋아요가 이미 존재합니다.");
+
 
     private final int status;
     private final String message;
