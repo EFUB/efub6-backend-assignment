@@ -1,5 +1,7 @@
 package efub.assignment.community.comment.service;
 
+import efub.assignment.community.alarm.enums.AlarmType;
+import efub.assignment.community.alarm.service.AlarmService;
 import efub.assignment.community.comment.domain.Comment;
 import efub.assignment.community.comment.domain.CommentLike;
 import efub.assignment.community.comment.dto.request.CommentRequest;
@@ -28,6 +30,7 @@ public class CommentService {
     private final PostService postService;
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final AlarmService alarmService;
 
     // [댓글 생성]
     @Transactional
@@ -39,6 +42,7 @@ public class CommentService {
         Comment newComment = request.toEntity(writer, post);
         commentRepository.save(newComment);
 
+        alarmService.createAlarm(AlarmType.COMMENT, post.getWriter(), post.getBoard().getTitle(), newComment.getContent());
         return newComment.getCommentId();
     }
 
