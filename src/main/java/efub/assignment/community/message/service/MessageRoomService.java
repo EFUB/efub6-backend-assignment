@@ -1,5 +1,6 @@
 package efub.assignment.community.message.service;
 
+import efub.assignment.community.comment.domain.Comment;
 import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
@@ -12,6 +13,9 @@ import efub.assignment.community.message.dto.response.MessageRoomResponse;
 import efub.assignment.community.message.dto.summary.MessageRoomSummary;
 import efub.assignment.community.message.repository.MessageRepository;
 import efub.assignment.community.message.repository.MessageRoomRepository;
+import efub.assignment.community.notification.domain.Notification;
+import efub.assignment.community.notification.domain.NotificationType;
+import efub.assignment.community.notification.repository.NotificationRepository;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.repository.PostRepository;
 import jakarta.validation.Valid;
@@ -28,6 +32,7 @@ public class MessageRoomService {
     private final MessageRepository messageRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public MessageRoomResponse createMessageRoom(Long senderId, CreateMessageRoomRequest request) {
@@ -55,8 +60,15 @@ public class MessageRoomService {
                 .content(request.getFirstMessage())
                 .build();
         messageRepository.save(firstMessage);
-
         newMessageRoom.getMessages().add(firstMessage);
+
+        String notificationContent = "새로운 쪽지방이 생겼어요";
+        Notification notification = Notification.builder()
+                .receiver(receiver)
+                .type(NotificationType.MESSAGE_ROOM)
+                .content(notificationContent)
+                .build();
+        notificationRepository.save(notification);
 
         return MessageRoomResponse.from(newMessageRoom);
     }
