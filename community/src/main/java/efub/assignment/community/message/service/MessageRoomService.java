@@ -8,6 +8,7 @@ import efub.assignment.community.message.domain.Message;
 import efub.assignment.community.message.domain.MessageRoom;
 import efub.assignment.community.message.dto.request.MessageRoomCreateRequest;
 import efub.assignment.community.message.dto.response.MessageRoomCreateResponse;
+import efub.assignment.community.message.dto.response.MessageRoomExistResponse;
 import efub.assignment.community.message.repository.MessageRepository;
 import efub.assignment.community.message.repository.MessageRoomRepository;
 import efub.assignment.community.post.domain.Post;
@@ -15,6 +16,8 @@ import efub.assignment.community.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +63,19 @@ public class MessageRoomService {
         Message savedMessage = messageRepository.save(message);
 
         return MessageRoomCreateResponse.from(savedMessageRoom, savedMessage);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<MessageRoomExistResponse> existMessageRoom(
+            Long memberId,
+            Long postId
+    ) {
+        Member sender = memberService.findByMemberId(memberId);
+        Post post = postService.findByPostId(postId);
+        Member receiver = post.getAuthor();
+
+        return messageRoomRepository
+                .findBySenderAndReceiverAndPost(sender, receiver, post)
+                .map(MessageRoomExistResponse::from);
     }
 }

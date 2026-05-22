@@ -2,6 +2,7 @@ package efub.assignment.community.message.controller;
 
 import efub.assignment.community.message.dto.request.MessageRoomCreateRequest;
 import efub.assignment.community.message.dto.response.MessageRoomCreateResponse;
+import efub.assignment.community.message.dto.response.MessageRoomExistResponse;
 import efub.assignment.community.message.service.MessageRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,5 +31,20 @@ public class MessageRoomController {
         return ResponseEntity
                 .created(URI.create("/message-rooms/" + response.getMessageRoomId()))
                 .body(response);
+    }
+
+    @GetMapping("/message-rooms/exist")
+    public ResponseEntity<?> existMessageRoom(
+            @RequestHeader("Auth-id") Long memberId,
+            @RequestParam Long postId
+    ) {
+        Optional<MessageRoomExistResponse> response =
+                messageRoomService.existMessageRoom(memberId, postId);
+
+        if (response.isPresent()) {
+            return ResponseEntity.ok(response.get());
+        }
+
+        return ResponseEntity.ok(List.of());
     }
 }
