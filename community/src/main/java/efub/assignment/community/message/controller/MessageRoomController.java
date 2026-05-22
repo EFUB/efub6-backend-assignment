@@ -3,6 +3,7 @@ package efub.assignment.community.message.controller;
 import efub.assignment.community.message.dto.request.MessageRoomCreateRequest;
 import efub.assignment.community.message.dto.response.MessageRoomCreateResponse;
 import efub.assignment.community.message.dto.response.MessageRoomExistResponse;
+import efub.assignment.community.message.dto.response.MessageRoomListResponse;
 import efub.assignment.community.message.service.MessageRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class MessageRoomController {
 
     private final MessageRoomService messageRoomService;
 
+    //쪽지방 생성
     @PostMapping("/posts/{postId}/message-rooms")
     public ResponseEntity<MessageRoomCreateResponse> createMessageRoom(
             @PathVariable Long postId,
@@ -33,6 +35,7 @@ public class MessageRoomController {
                 .body(response);
     }
 
+    //쪽지방 여부 조회
     @GetMapping("/message-rooms/exist")
     public ResponseEntity<?> existMessageRoom(
             @RequestHeader("Auth-id") Long memberId,
@@ -46,5 +49,14 @@ public class MessageRoomController {
         }
 
         return ResponseEntity.ok(List.of());
+    }
+
+    //쪽지방 목록 조회
+    @GetMapping("/message-rooms/{memberId}")
+    public ResponseEntity<MessageRoomListResponse> getMessageRooms(
+            @PathVariable Long memberId
+    ) {
+        MessageRoomListResponse response = messageRoomService.getMessageRooms(memberId);
+        return ResponseEntity.ok(response);
     }
 }

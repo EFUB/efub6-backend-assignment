@@ -9,6 +9,8 @@ import efub.assignment.community.message.domain.MessageRoom;
 import efub.assignment.community.message.dto.request.MessageRoomCreateRequest;
 import efub.assignment.community.message.dto.response.MessageRoomCreateResponse;
 import efub.assignment.community.message.dto.response.MessageRoomExistResponse;
+import efub.assignment.community.message.dto.response.MessageRoomListResponse;
+import efub.assignment.community.message.dto.summary.MessageRoomSummary;
 import efub.assignment.community.message.repository.MessageRepository;
 import efub.assignment.community.message.repository.MessageRoomRepository;
 import efub.assignment.community.post.domain.Post;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -78,4 +81,25 @@ public class MessageRoomService {
                 .findBySenderAndReceiverAndPost(sender, receiver, post)
                 .map(MessageRoomExistResponse::from);
     }
+
+    @Transactional(readOnly = true)
+    public MessageRoomListResponse getMessageRooms(Long memberId) {
+        Member member = memberService.findByMemberId(memberId);
+
+        List<MessageRoomSummary> messageRooms = messageRoomRepository
+                .findAllBySenderOrReceiver(member, member)
+                .stream()
+                .map(messageRoom -> {
+                    Message lastMessage = messageRepository
+                            .findTopByMessageRoomOrderByCreatedAtDesc(messageRoom)
+                            .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+
+                    return MessageRoomSummary.from(messageRoom, lastMessage);
+                })
+                .sorted((room1, room2) -> room2.getLastSentAt().compareTo(room1.getLastSentAt()))
+                .toList();
+
+        return new MessageRoomListResponse(messageRooms);
+    }
+
 }
