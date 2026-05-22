@@ -110,16 +110,32 @@ public class MessageRoomService {
 
     //쪽지방 삭제
     @Transactional
-    public void deleteMessageRoom(Long messageRoomId) {
+    public void deleteMessageRoom(
+            Long messageRoomId,
+            Long memberId
+    ) {
         MessageRoom messageRoom = findByMessageRoomId(messageRoomId);
+        Member member = memberService.findByMemberId(memberId);
+
+        validateMessageRoomMember(messageRoom, member);
 
         messageRepository.deleteAllByMessageRoom(messageRoom);
         messageRoomRepository.delete(messageRoom);
     }
 
-    public MessageRoom findByMessageRoomId(Long messageRoomId) {
+    private void validateMessageRoomMember(MessageRoom messageRoom, Member member) {
+        Long memberId = member.getMemberId();
+
+        boolean isSender = messageRoom.getSender().getMemberId().equals(memberId);
+        boolean isReceiver = messageRoom.getReceiver().getMemberId().equals(memberId);
+
+        if (!isSender && !isReceiver) {
+            throw new CustomException(ErrorCode.MESSAGE_ROOM_ACCESS_DENIED);
+        }
+    }
+
+    private MessageRoom findByMessageRoomId(Long messageRoomId) {
         return messageRoomRepository.findById(messageRoomId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
     }
-
 }

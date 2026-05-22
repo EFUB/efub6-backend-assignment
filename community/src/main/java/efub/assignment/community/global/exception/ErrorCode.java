@@ -33,6 +33,7 @@ public enum ErrorCode {
     MESSAGE_ROOM_ALREADY_EXISTS(400, "이미 쪽지방이 존재합니다."),
     MESSAGE_ROOM_ACCESS_DENIED(403, "쪽지방에 접근할 권한이 없습니다."),
     MESSAGE_ROOM_NOT_FOUND(404, "쪽지방이 존재하지 않습니다."),
+
     MESSAGE_TO_SELF_NOT_ALLOWED(400, "자기 자신에게 쪽지를 보낼 수 없습니다."),
     MESSAGE_NOT_FOUND(404, "쪽지가 존재하지 않습니다.");
 

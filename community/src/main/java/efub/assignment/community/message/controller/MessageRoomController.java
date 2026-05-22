@@ -60,9 +60,11 @@ public class MessageRoomController {
     //쪽지방 삭제
     @DeleteMapping("/message-rooms/{messageRoomId}")
     public ResponseEntity<Void> deleteMessageRoom(
-            @PathVariable Long messageRoomId
+            @PathVariable Long messageRoomId,
+            @RequestHeader("Auth-id") Long memberId
     ) {
-        messageRoomService.deleteMessageRoom(messageRoomId);
+        messageRoomService.deleteMessageRoom(messageRoomId, memberId);
+
         return ResponseEntity.noContent().build();
     }
 }
