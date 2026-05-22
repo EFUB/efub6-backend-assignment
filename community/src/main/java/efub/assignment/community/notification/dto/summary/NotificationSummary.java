@@ -1,5 +1,6 @@
 package efub.assignment.community.notification.dto.summary;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import efub.assignment.community.notification.domain.Notification;
 import efub.assignment.community.notification.domain.NotificationType;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotificationSummary {
 
     private Long notificationId;
@@ -25,11 +27,7 @@ public class NotificationSummary {
         return NotificationSummary.builder()
                 .notificationId(notification.getNotificationId())
                 .type(convertType(notification))
-                .boardName(
-                        notification.getType() == NotificationType.COMMENT
-                                ? notification.getBoardName()
-                                : null
-                )
+                .boardName(notification.getBoardName())
                 .content(notification.getContent())
                 .createdAt(notification.getCreatedAt())
                 .build();
