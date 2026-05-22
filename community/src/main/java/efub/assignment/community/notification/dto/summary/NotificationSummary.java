@@ -1,0 +1,44 @@
+package efub.assignment.community.notification.dto.summary;
+
+import efub.assignment.community.notification.domain.Notification;
+import efub.assignment.community.notification.domain.NotificationType;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Builder
+public class NotificationSummary {
+
+    private Long notificationId;
+
+    private String type;
+
+    private String boardName;
+
+    private String content;
+
+    private LocalDateTime createdAt;
+
+    public static NotificationSummary from(Notification notification) {
+        return NotificationSummary.builder()
+                .notificationId(notification.getNotificationId())
+                .type(convertType(notification))
+                .boardName(
+                        notification.getType() == NotificationType.COMMENT
+                                ? notification.getBoardName()
+                                : null
+                )
+                .content(notification.getContent())
+                .createdAt(notification.getCreatedAt())
+                .build();
+    }
+
+    private static String convertType(Notification notification) {
+        return switch (notification.getType()) {
+            case COMMENT -> "댓글";
+            case MESSAGE_ROOM -> "쪽지방";
+        };
+    }
+}
