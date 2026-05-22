@@ -59,4 +59,13 @@ public class MessageRoomController {
         MessageRoomListResponse response = messageRoomService.getMessageRooms(memberId);
         return ResponseEntity.ok(response);
     }
+
+    //쪽지방 삭제
+    @DeleteMapping("/message-rooms/{messageRoomId}")
+    public ResponseEntity<Void> deleteMessageRoom(
+            @PathVariable Long messageRoomId
+    ) {
+        messageRoomService.deleteMessageRoom(messageRoomId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -102,4 +102,17 @@ public class MessageRoomService {
         return new MessageRoomListResponse(messageRooms);
     }
 
+    @Transactional
+    public void deleteMessageRoom(Long messageRoomId) {
+        MessageRoom messageRoom = findByMessageRoomId(messageRoomId);
+
+        messageRepository.deleteAllByMessageRoom(messageRoom);
+        messageRoomRepository.delete(messageRoom);
+    }
+
+    public MessageRoom findByMessageRoomId(Long messageRoomId) {
+        return messageRoomRepository.findById(messageRoomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
+    }
+
 }

@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Optional<Message> findTopByMessageRoomOrderByCreatedAtDesc(MessageRoom messageRoom);
+
+    void deleteAllByMessageRoom(MessageRoom messageRoom);
 }
