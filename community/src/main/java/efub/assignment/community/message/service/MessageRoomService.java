@@ -31,6 +31,7 @@ public class MessageRoomService {
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
 
+    //쪽지방 생성
     @Transactional
     public MessageRoomCreateResponse createMessageRoom(
             Long postId,
@@ -68,20 +69,25 @@ public class MessageRoomService {
         return MessageRoomCreateResponse.from(savedMessageRoom, savedMessage);
     }
 
+    //쪽지방 여부 조회
     @Transactional(readOnly = true)
-    public Optional<MessageRoomExistResponse> existMessageRoom(
+    public MessageRoomExistResponse existMessageRoom(
             Long memberId,
+            Long receiverId,
             Long postId
     ) {
         Member sender = memberService.findByMemberId(memberId);
+        Member receiver = memberService.findByMemberId(receiverId);
         Post post = postService.findByPostId(postId);
-        Member receiver = post.getAuthor();
 
-        return messageRoomRepository
+        MessageRoom messageRoom = messageRoomRepository
                 .findBySenderAndReceiverAndPost(sender, receiver, post)
-                .map(MessageRoomExistResponse::from);
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
+
+        return MessageRoomExistResponse.from(messageRoom);
     }
 
+    //쪽지방 목록 조회
     @Transactional(readOnly = true)
     public MessageRoomListResponse getMessageRooms(Long memberId) {
         Member member = memberService.findByMemberId(memberId);
@@ -102,6 +108,7 @@ public class MessageRoomService {
         return new MessageRoomListResponse(messageRooms);
     }
 
+    //쪽지방 삭제
     @Transactional
     public void deleteMessageRoom(Long messageRoomId) {
         MessageRoom messageRoom = findByMessageRoomId(messageRoomId);

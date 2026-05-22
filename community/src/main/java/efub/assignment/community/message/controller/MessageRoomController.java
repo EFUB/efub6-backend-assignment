@@ -39,16 +39,13 @@ public class MessageRoomController {
     @GetMapping("/message-rooms/exist")
     public ResponseEntity<?> existMessageRoom(
             @RequestHeader("Auth-id") Long memberId,
+            @RequestParam Long receiverId,
             @RequestParam Long postId
     ) {
-        Optional<MessageRoomExistResponse> response =
-                messageRoomService.existMessageRoom(memberId, postId);
+        MessageRoomExistResponse response =
+                messageRoomService.existMessageRoom(memberId, receiverId, postId);
 
-        if (response.isPresent()) {
-            return ResponseEntity.ok(response.get());
-        }
-
-        return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(response);
     }
 
     //쪽지방 목록 조회
