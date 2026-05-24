@@ -11,10 +11,7 @@ public record MessageRoomSummary(
         String recentMessage,
         LocalDateTime recentSentAt
 ) {
-    public static MessageRoomSummary from(MessageRoom messageRoom) {
-        List<Message> messages = messageRoom.getMessages();
-        Message recentMessage = messages.get(messages.size() - 1); // 제일 뒤에 있는 쪽지 가져오기
-
+    public static MessageRoomSummary of(MessageRoom messageRoom, Message recentMessage) {
         return new MessageRoomSummary(
                 messageRoom.getId(),
                 recentMessage.getContent(),

@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 public record MessageRoomResponse(
         Long messageRoomId,
-        Long senderId,
-        Long receiverId,
+        Long creatorId,
+        Long partnerId,
         String content,
         LocalDateTime createdAt
 ) {
@@ -17,8 +17,8 @@ public record MessageRoomResponse(
 
         return new MessageRoomResponse(
                 messageRoom.getId(),
-                messageRoom.getSender().getMemberId(),
-                messageRoom.getReceiver().getMemberId(),
+                messageRoom.getCreator().getMemberId(),
+                messageRoom.getPartner().getMemberId(),
                 firstMessageContent,
                 messageRoom.getCreatedAt()
         );

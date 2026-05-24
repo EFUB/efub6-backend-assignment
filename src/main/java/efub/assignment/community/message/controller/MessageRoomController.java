@@ -1,5 +1,7 @@
 package efub.assignment.community.message.controller;
 
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.message.dto.request.CreateMessageRoomRequest;
 import efub.assignment.community.message.dto.response.MessageRoomListResponse;
 import efub.assignment.community.message.dto.response.MessageRoomResponse;
@@ -18,18 +20,22 @@ public class MessageRoomController {
 
     // 쪽지방 생성
     @PostMapping
-    public ResponseEntity<MessageRoomResponse> createMessageRoom(@RequestHeader("Auth-Id") Long senderId,
+    public ResponseEntity<MessageRoomResponse> createMessageRoom(@RequestHeader("Auth-Id") Long creatorId,
                                                                  @Valid @RequestBody CreateMessageRoomRequest request) {
-        MessageRoomResponse response = messageRoomService.createMessageRoom(senderId, request);
+        MessageRoomResponse response = messageRoomService.createMessageRoom(creatorId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 쪽지방 여부 조회
-    @GetMapping("/check")
-    public ResponseEntity<Long> checkMessageRoomExists(@RequestHeader("Auth-Id") Long senderId,
-                                                       @RequestParam("receiverId") Long receiverId,
+    @GetMapping("/existence")
+    public ResponseEntity<Long> checkMessageRoomExists(@RequestHeader("Auth-Id") Long creatorId,
+                                                       @RequestParam("partnerId") Long partnerId,
                                                        @RequestParam("postId") Long postId) {
-        Long messageRoomId = messageRoomService.checkMessageRoomExists(senderId, receiverId, postId);
+        Long messageRoomId = messageRoomService.checkMessageRoomExists(creatorId, partnerId, postId);
+
+        if (messageRoomId == null) {
+            throw new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND);
+        }
 
         return ResponseEntity.ok(messageRoomId);
     }

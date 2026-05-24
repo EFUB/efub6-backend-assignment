@@ -26,6 +26,17 @@ public class MessageService {
     private final MemberRepository memberRepository;
 
     @Transactional
+    public Message createFirstMessage(MessageRoom messageRoom, Member sender, String content) {
+        Message firstMessage = Message.builder()
+                .sender(sender)
+                .messageRoom(messageRoom)
+                .content(content)
+                .build();
+
+        return messageRepository.save(firstMessage);
+    }
+
+    @Transactional
     public MessageResponse createMessage(Long messageRoomId, Long senderId, CreateMessageRequest request) {
         MessageRoom messageRoom = findByMessageRoomId(messageRoomId);
         Member sender = findByMemberId(senderId);
@@ -60,7 +71,7 @@ public class MessageService {
     }
 
     private void authorizeMessageRoomParticipant(MessageRoom messageRoom, Member member) {
-        if (!messageRoom.getSender().equals(member) && !messageRoom.getReceiver().equals(member)) {
+        if (!messageRoom.getCreator().equals(member) && !messageRoom.getPartner().equals(member)) {
             throw new CustomException(ErrorCode.NOT_MESSAGE_ROOM_PARTICIPANT);
         }
     }

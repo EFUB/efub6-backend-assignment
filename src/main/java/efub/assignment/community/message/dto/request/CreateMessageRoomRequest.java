@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CreateMessageRoomRequest {
 
     @NotNull(message = "받는 사람 ID는 필수입니다.")
-    private Long receiverId;
+    private Long partnerId;
 
     @NotNull(message = "시작된 게시글 ID는 필수입니다.")
     private Long postId;
@@ -21,10 +21,10 @@ public class CreateMessageRoomRequest {
     @NotBlank(message = "첫 쪽지 내용은 필수입니다.")
     private String firstMessage;
 
-    public MessageRoom toEntity(Member sender, Member receiver, Post post) {
+    public MessageRoom toEntity(Member creator, Member partner, Post post) {
             return MessageRoom.builder()
-                    .sender(sender)
-                    .receiver(receiver)
+                    .creator(creator)
+                    .partner(partner)
                     .post(post)
                     .build();
     }

@@ -30,42 +30,38 @@ import java.util.List;
 public class MessageRoomService {
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRepository messageRepository;
+    private final MessageService messageService;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final NotificationRepository notificationRepository;
 
     @Transactional
-    public MessageRoomResponse createMessageRoom(Long senderId, CreateMessageRoomRequest request) {
-        Member sender = findByMemberId(senderId);
-        Member receiver = findByMemberId(request.getReceiverId());
-        Post post = findByPostId(request.getPostId());
-
+    public MessageRoomResponse createMessageRoom(Long creatorId, CreateMessageRoomRequest request) {
         // 내가 나 자신과 쪽지방을 만들 순 없음
-        if(senderId.equals(request.getReceiverId())) {
+        if(creatorId.equals(request.getPartnerId())) {
             throw new CustomException(ErrorCode.CANNOT_MESSAGE_SELF);
         }
 
+        Member creator = findByMemberId(creatorId);
+        Member partner = findByMemberId(request.getPartnerId());
+        Post post = findByPostId(request.getPostId());
+
         // 이미 쪽지방이 있는 경우 또 만들면 안됨
-        messageRoomRepository.findExistingMessageRoom(post, sender, receiver)
+        messageRoomRepository.findExistingMessageRoom(post, creator, partner)
                 .ifPresent(room -> {
                     throw new CustomException(ErrorCode.MESSAGE_ROOM_ALREADY_EXISTS);
                 });
 
-        MessageRoom newMessageRoom = request.toEntity(sender, receiver, post);
+        MessageRoom newMessageRoom = request.toEntity(creator, partner, post);
         messageRoomRepository.save(newMessageRoom);
 
-        Message firstMessage = Message.builder()
-                .sender(sender)
-                .messageRoom(newMessageRoom)
-                .content(request.getFirstMessage())
-                .build();
-        messageRepository.save(firstMessage);
+        Message firstMessage = messageService.createFirstMessage(newMessageRoom, creator, request.getFirstMessage());
         newMessageRoom.getMessages().add(firstMessage);
 
-        String notificationContent = "새로운 쪽지방이 생겼어요";
+        String notificationContent = NotificationType.NEW_MESSAGE_ROOM_CREATED.getMessagePrefix();
         Notification notification = Notification.builder()
-                .receiver(receiver)
-                .type(NotificationType.MESSAGE_ROOM)
+                .receiver(partner)
+                .type(NotificationType.NEW_MESSAGE_ROOM_CREATED)
                 .content(notificationContent)
                 .build();
         notificationRepository.save(notification);
@@ -74,25 +70,31 @@ public class MessageRoomService {
     }
 
     @Transactional(readOnly = true)
-    public Long checkMessageRoomExists(Long senderId, Long receiverId, Long postId) {
+    public Long checkMessageRoomExists(Long creatorId, Long partnerId, Long postId) {
         Post post = findByPostId(postId);
-        Member sender = findByMemberId(senderId);
-        Member receiver = findByMemberId(receiverId);
+        Member creator = findByMemberId(creatorId);
+        Member partner = findByMemberId(partnerId);
 
         // sender - receiver의 쪽지방은 순서 상관없이 1개만 존재.
-        MessageRoom messageRoom = messageRoomRepository.findExistingMessageRoom(post, sender, receiver)
-                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
+        return messageRoomRepository.findExistingMessageRoom(post, creator, partner)
+                .map(MessageRoom::getId)
+                .orElse(null);
 
-        return messageRoom.getId();
     }
 
     @Transactional(readOnly = true)
     public MessageRoomListResponse getAllMessageRooms(Long memberId) {
         Member member = findByMemberId(memberId);
 
-        List<MessageRoomSummary> messageRoomSummaries = messageRoomRepository.findAllBySenderOrReceiver(member)
+        List<MessageRoomSummary> messageRoomSummaries = messageRoomRepository.findAllBySenderOrReceiverWithFetchJoin(member)
                 .stream()
-                .map(MessageRoomSummary::from)
+                .map(room -> {
+                    List<Message> messages = messageRepository.findTop1ByMessageRoomWithFetchJoin(room);
+                    if (messages.isEmpty()) {
+                        throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+                    }
+                    return MessageRoomSummary.of(room, messages.get(0));
+                })
                 .toList();
 
         return new MessageRoomListResponse(messageRoomSummaries);
@@ -121,11 +123,8 @@ public class MessageRoomService {
     }
 
     private void authorizeMessageRoomParticipant(MessageRoom messageRoom, Member member) {
-        if (!messageRoom.getSender().equals(member) && !messageRoom.getReceiver().equals(member)) {
+        if (!messageRoom.isParticipant(member)) {
             throw new CustomException(ErrorCode.NOT_MESSAGE_ROOM_PARTICIPANT);
         }
     }
-
-
-
 }

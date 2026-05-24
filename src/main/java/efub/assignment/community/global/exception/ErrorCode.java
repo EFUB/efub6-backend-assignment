@@ -28,6 +28,7 @@ public enum ErrorCode {
     COMMENT_ACCOUNT_MISMATCH(401, "댓글 주인이 아닙니다."),
 
     // message 관련
+    MESSAGE_NOT_FOUND(404, "존재하는 쪽지가 없습니다."),
     MESSAGE_ROOM_NOT_FOUND(404, "존재하는 쪽지방이 없습니다."),
     MESSAGE_ROOM_ALREADY_EXISTS(409, "이미 존재하는 쪽지방이 있습니다."),
     CANNOT_MESSAGE_SELF(400, "자기 자신에게 쪽지를 보낼 수 없습니다."),

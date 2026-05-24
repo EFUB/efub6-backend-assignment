@@ -11,9 +11,7 @@ public record MessageListResponse (
         List<MessageSummary> messages
 ) {
     public static MessageListResponse of(MessageRoom messageRoom, Long memberId) {
-        Long partnerId = messageRoom.getSender().getMemberId().equals(memberId)
-                ? messageRoom.getReceiver().getMemberId()
-                : messageRoom.getSender().getMemberId();
+        Long partnerId = messageRoom.getPartner(memberId).getMemberId();
 
         List<MessageSummary> messageSummaries = messageRoom.getMessages().stream()
                 .map(message -> MessageSummary.of(message, memberId))

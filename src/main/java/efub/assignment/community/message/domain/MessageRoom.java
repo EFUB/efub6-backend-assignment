@@ -23,12 +23,12 @@ public class MessageRoom extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private Member sender;
+    @JoinColumn(name = "creator_id")
+    private Member creator;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
-    private Member receiver;
+    @JoinColumn(name = "partner_id")
+    private Member partner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -39,9 +39,22 @@ public class MessageRoom extends BaseEntity {
     private List<Message> messages = new ArrayList<>();
 
     @Builder
-    public MessageRoom(Member sender, Member receiver, Post post) {
-        this.sender = sender;
-        this.receiver = receiver;
+    public MessageRoom(Member creator, Member partner, Post post) {
+        this.creator = creator;
+        this.partner = partner;
         this.post = post;
+    }
+
+    public Member getPartner(Long memberId) {
+        if (this.creator.getMemberId().equals(memberId)) {
+            return this.partner;
+        }
+        return this.creator;
+    }
+
+    public boolean isParticipant(Member member) {
+        // ID 값으로 안전하게 비교하거나 객체로 비교!
+        Long memberId = member.getMemberId();
+        return this.creator.getMemberId().equals(memberId) || this.partner.getMemberId().equals(memberId);
     }
 }
