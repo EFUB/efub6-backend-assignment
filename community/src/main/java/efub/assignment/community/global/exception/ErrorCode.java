@@ -23,7 +23,17 @@ public enum ErrorCode {
 
     // comment
     COMMENT_NOT_FOUND(404, "존재하지 않는 댓글입니다."),
-    COMMENT_ACCOUNT_MISMATCH(403, "댓글 작성자가 아닙니다.");
+    COMMENT_ACCOUNT_MISMATCH(403, "댓글 작성자가 아닙니다."),
+
+    // postLike
+    LIKE_ALREADY_EXISTS(400, "좋아요가 이미 존재합니다."),
+    LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다."),
+
+    // messageRoom
+    MESSAGEROOM_NOT_FOUND(404, "쪽지방이 존재하지 않습니다."),
+
+    // message
+    NOT_MESSAGEROOM_MEMBER(403, "쪽지방의 참여자가 아닙니다.");
 
     private final int status;
     private final String message;
