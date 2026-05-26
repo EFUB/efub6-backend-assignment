@@ -1,0 +1,13 @@
+package efub.assignment.community.message.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class MessageRoomCreateRequest {
+
+    @NotBlank(message = "쪽지 내용을 입력해주세요.")
+    private String content;
+}
