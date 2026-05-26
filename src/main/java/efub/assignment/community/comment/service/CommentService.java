@@ -10,6 +10,10 @@ import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
+import efub.assignment.community.notification.domain.Notification;
+import efub.assignment.community.notification.domain.NotificationType;
+import efub.assignment.community.notification.repository.NotificationRepository;
+import efub.assignment.community.notification.service.NotificationService;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public Long createComment(Long postId, Long memberId, CreateCommentRequest request) {
@@ -34,8 +39,15 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         Comment newComment = request.toEntity(post, writerMember);
-
         commentRepository.save(newComment);
+
+        // 내 글에 내가 댓글을 단게 아닐 때만 알림 생성
+        if (!post.getWriter().getMemberId().equals(memberId)) {
+            String boardName = post.getBoard().getName();
+
+            notificationService.createCommentNotification(post.getWriter(), boardName, newComment.getContent());
+        }
+
         return newComment.getId();
     }
 
