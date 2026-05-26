@@ -28,7 +28,15 @@ public enum ErrorCode {
 
     // Comment
     COMMENT_NOT_FOUND(404, "해당 id의 댓글이 존재하지 않습니다."),
-    COMMENT_MEMBER_MISMATCH(403, "댓글 작성자가 아닙니다.");
+    COMMENT_MEMBER_MISMATCH(403, "댓글 작성자가 아닙니다."),
+
+    // Message Room
+    MESSAGE_ROOM_NOT_FOUND(404, "존재하는 쪽지방이 없습니다."),
+    MESSAGE_ROOM_ALREADY_EXISTS(400, "이미 존재하는 쪽지방입니다."),
+    MESSAGE_ROOM_SELF_NOT_ALLOWED(400, "자기 자신에게는 쪽지를 보낼 수 없습니다."),
+
+    //Message
+    MESSAGE_ROOM_ACCESS_DENIED(403, "해당 쪽지방에 접근할 권한이 없습니다.");
 
     private final int status;
     private final String message;

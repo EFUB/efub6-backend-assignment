@@ -49,7 +49,7 @@ public class PostService {
                 .build();
 
         Post savedPost = postRepository.save(post);
-        return PostResponseDto.from(savedPost);
+        return PostResponseDto.from(savedPost, postLikeRepository.countByPost(post));
     }
 
     // 게시글 목록 조회
@@ -62,7 +62,10 @@ public class PostService {
         List<PostSummaryDto> posts = postRepository
                 .findAllByBoard_BoardIdOrderByCreatedAtDesc(boardId)
                 .stream()
-                .map(PostSummaryDto::from)
+                .map(post -> PostSummaryDto.from(
+                        post,
+                        postLikeRepository.countByPost(post)
+                ))
                 .toList();
 
         Long totalPosts = postRepository.countByBoard_BoardId(boardId);
@@ -78,7 +81,7 @@ public class PostService {
         postRepository.increaseViewCount(postId);
         // 최신 조회수 반영
         post = findByPostId(postId);
-        return PostResponseDto.from(post);
+        return PostResponseDto.from(post, postLikeRepository.countByPost(post));
     }
 
     // 게시글 수정
@@ -88,7 +91,7 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         authorizePostWriter(post, member);
         post.updatePost(requestDto.title(), requestDto.content());
-        return PostResponseDto.from(post);
+        return PostResponseDto.from(post, postLikeRepository.countByPost(post));
     }
 
     // 게시글 삭제
@@ -117,9 +120,6 @@ public class PostService {
                 .build();
 
         postLikeRepository.save(postLike);
-
-        // 좋아요 수 증가
-        post.increaseLikeCount();
     }
 
     // 게시글 좋아요 삭제
@@ -133,9 +133,6 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_LIKE_NOT_FOUND));
 
         postLikeRepository.delete(postLike);
-
-        // 좋아요 수 감소
-        post.decreaseLikeCount();
     }
 
     // helpers

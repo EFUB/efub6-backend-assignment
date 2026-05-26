@@ -67,11 +67,11 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{postId}/like")
-    public ResponseEntity<String> unlikePost(
+    public ResponseEntity<Void> unlikePost(
             @PathVariable("postId") Long postId,
             @RequestHeader("Auth-Id") Long memberId
     ) {
         postService.unlikePost(postId, memberId);
-        return ResponseEntity.ok("좋아요가 취소되었습니다.");
+        return ResponseEntity.noContent().build();
     }
 }

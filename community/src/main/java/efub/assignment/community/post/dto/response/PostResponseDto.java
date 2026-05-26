@@ -16,9 +16,7 @@ public record PostResponseDto(
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
-    public static PostResponseDto from(Post post) {
-        // anonymous 여부
-        // anonymous : true -> hide
+    public static PostResponseDto from(Post post, Long likeCount) {
         Long memberId = post.getAnonymous() ? null : post.getMember().getMemberId();
 
         return new PostResponseDto(
@@ -29,7 +27,7 @@ public record PostResponseDto(
                 post.getAnonymous(),
                 post.getContent(),
                 post.getViewCount(),
-                post.getLikeCount(),
+                likeCount,
                 post.getCreatedAt(),
                 post.getModifiedAt()
         );

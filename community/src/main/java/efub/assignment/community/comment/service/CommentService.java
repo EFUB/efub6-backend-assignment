@@ -10,6 +10,7 @@ import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.service.MemberService;
+import efub.assignment.community.notification.service.NotificationService;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class CommentService {
     private final MemberService memberService;
     private final PostService postService;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     // 댓글 생성
     public CommentResponseDto createComment(Long postId, CreateCommentRequestDto requestDto) {
@@ -32,6 +34,13 @@ public class CommentService {
 
         Comment comment = requestDto.toEntity(writer, post);
         Comment savedComment = commentRepository.save(comment);
+
+        // 알림 생성
+        notificationService.createCommentNotification(
+                post.getMember(),
+                post.getBoard().getBoardName(),
+                savedComment.getContent()
+        );
 
         return CommentResponseDto.from(savedComment);
     }

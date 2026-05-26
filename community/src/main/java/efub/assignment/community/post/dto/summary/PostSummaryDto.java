@@ -11,13 +11,13 @@ public record PostSummaryDto(
         Long viewCount,
         Long likeCount
 ) {
-    public static PostSummaryDto from(Post post) {
+    public static PostSummaryDto from(Post post,Long likeCount) {
         return new PostSummaryDto(
                 post.getPostId(),
                 post.getTitle(),
                 post.getAnonymous(),
                 post.getViewCount(),
-                post.getLikeCount()
+                likeCount
                 );
     }
 }
