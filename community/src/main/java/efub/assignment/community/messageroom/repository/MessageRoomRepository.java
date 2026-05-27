@@ -17,4 +17,11 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
     @Query("SELECT m FROM MessageRoom m WHERE m.post = :post AND (m.creator = :requester OR m.target = :requester)")
     Optional<MessageRoom> findByPostAndMember(@Param("post")Post post, @Param("requester")Member requester);
 
+    @Query("SELECT m FROM MessageRoom m WHERE m.post = :post AND (m.creator = :requester OR m.target = :requester) AND (m.creator = :receiver OR m.target = :receiver)")
+    Optional<MessageRoom> findByPostAndMembers(@Param("post")Post post, @Param("requester")Member requester, @Param("receiver")Member receiver);
+
+    @Query("SELECT count(m) > 0 FROM MessageRoom m " +
+            "WHERE m.post = :post " +
+            "AND ((m.creator = :creator AND m.target = :target) OR (m.creator = :target AND m.target = :creator))")
+    boolean existsMessageRoomBetweenMembers(@Param("post") Post post, @Param("creator")Member creator, @Param("target") Member target);
 }

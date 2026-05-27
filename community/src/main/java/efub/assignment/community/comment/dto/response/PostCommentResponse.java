@@ -1,14 +1,12 @@
-package efub.assignment.community.post.dto.response;
+package efub.assignment.community.comment.dto.response;
 
 import efub.assignment.community.comment.domain.Comment;
-import efub.assignment.community.comment.dto.response.CommentResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -21,7 +19,7 @@ public class PostCommentResponse {
     public static PostCommentResponse of (Long postId, List<Comment> commentList) {
         return PostCommentResponse.builder()
                 .postId(postId)
-                .postCommentList(commentList.stream().map(CommentResponse::of).collect(Collectors.toList()))
+                .postCommentList(commentList.stream().map(CommentResponse::of).toList())
                 .count((long) commentList.size())
                 .build();
     }

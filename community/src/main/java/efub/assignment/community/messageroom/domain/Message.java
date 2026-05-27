@@ -14,13 +14,15 @@ import lombok.NoArgsConstructor;
 public class Message extends BaseEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column(name = "message_id")
     private Long id;
 
     @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", nullable = false)
     private Member sender;
 
     @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "messageroom_id")
+    @JoinColumn(name = "messageroom_id", nullable = false)
     private MessageRoom messageRoom;
 
     @Column (name = "content")

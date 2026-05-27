@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Builder @Getter
 @AllArgsConstructor
 public class CreateMemberResponseDto {
@@ -14,7 +12,6 @@ public class CreateMemberResponseDto {
     private String email;
     private String university;
     private String studentId;
-    private LocalDateTime createdAt;
 
     public static CreateMemberResponseDto from(Member member) {
         return CreateMemberResponseDto.builder()
@@ -22,7 +19,6 @@ public class CreateMemberResponseDto {
                 .nickname(member.getNickname())
                 .university(member.getUniversity())
                 .studentId(member.getStudentId())
-                .createdAt(member.getCreatedAt())
                 .build();
     }
 }
