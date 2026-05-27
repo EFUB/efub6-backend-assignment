@@ -16,6 +16,9 @@ public class CreateMessageRoomRequest {
     @NotNull
     private Long postId;
 
+    @NotNull
+    private Long receiverId;
+
     public MessageRoom toEntity(Member sender, Member receiver, Post post) {
         return new MessageRoom(sender, receiver, post);
     }

@@ -39,7 +39,7 @@ public class MessageRoomService {
     public CreateMessageRoomResponse createMessageRoom(Long senderId, CreateMessageRoomRequest request) {
         Post post = postService.findByPostId(request.getPostId());
         Member sender = memberService.findByMemberId(senderId);
-        Member receiver = memberService.findByMemberId(post.getWriter().getMemberId());
+        Member receiver = memberService.findByMemberId(request.getReceiverId());
 
         MessageRoom newMessageRoom = request.toEntity(sender, receiver, post);
 
