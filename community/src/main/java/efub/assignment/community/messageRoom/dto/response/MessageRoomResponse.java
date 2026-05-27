@@ -19,7 +19,7 @@ public class MessageRoomResponse {
         return MessageRoomResponse.builder()
                 .messageRoomId(messageRoom.getId())
                 .latestMessage(latestMessage.getMessage())
-                .createdAt(messageRoom.getCreatedAt())
+                .createdAt(latestMessage.getCreatedAt())
                 .build();
     }
 }
