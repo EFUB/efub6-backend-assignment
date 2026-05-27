@@ -62,7 +62,7 @@ public class MessageRoomService {
         Optional<MessageRoom> messageRoom = messageRoomRepository.findBySenderAndReceiverAndPost(sender, receiver, post);
 
         return messageRoom.map(GetMessageRoomResponse::from)
-                .orElse(GetMessageRoomResponse.empty());
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGEROOM_NOT_FOUND));
     }
 
     // 쪽지방 삭제
