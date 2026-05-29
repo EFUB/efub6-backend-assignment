@@ -13,11 +13,12 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/message-rooms/{messageRoomId}/messages")
 public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping("/message-rooms/{messageRoomId}/messages")
+    @PostMapping
     public ResponseEntity<MessageCreateResponse> createMessage(
             @PathVariable Long messageRoomId,
             @RequestHeader("Auth-id") Long senderId,
@@ -31,7 +32,7 @@ public class MessageController {
                 .body(response);
     }
 
-    @GetMapping("/message-rooms/{messageRoomId}/messages")
+    @GetMapping
     public ResponseEntity<MessageListResponse> getMessages(
             @PathVariable Long messageRoomId,
             @RequestHeader("Auth-id") Long memberId

@@ -71,6 +71,13 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
+    @Transactional(readOnly = true)
+    public void validateBoardExists(Long boardId) {
+        if (!boardRepository.existsById(boardId)) {
+            throw new CustomException(ErrorCode.BOARD_NOT_FOUND);
+        }
+    }
+
     public Board findByBoardId(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));

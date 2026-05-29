@@ -46,14 +46,14 @@ public class PostService {
     //게시판의 게시글 목록 조회
     @Transactional(readOnly = true)
     public PostListResponse getAllPosts(Long boardId) {
-        boardService.findByBoardId(boardId);
+        boardService.validateBoardExists(boardId);
 
         List<PostSummary> postSummaries = postRepository.findAllByBoard_BoardIdOrderByCreatedAtDesc(boardId)
                 .stream()
                 .map(PostSummary::from)
                 .toList();
-        return new PostListResponse(postSummaries);
 
+        return new PostListResponse(postSummaries);
     }
 
     //게시글 단 건 조회

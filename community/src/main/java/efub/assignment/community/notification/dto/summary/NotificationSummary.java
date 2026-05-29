@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotificationSummary {
 
     private Long notificationId;
 
     private String type;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String boardName;
 
     private String content;

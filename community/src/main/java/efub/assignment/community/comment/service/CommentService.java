@@ -78,7 +78,7 @@ public class CommentService {
     }
 
     private void authorizeCommentWriter(Comment comment,Member member){
-        if(!comment.getWriter().equals(member)){
+        if(!comment.getWriter().equals(member.getMemberId())){
             throw new CustomException(ErrorCode.COMMENT_ACCOUNT_MISMATCH);
         }
     }
