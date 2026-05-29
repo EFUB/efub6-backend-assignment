@@ -5,6 +5,7 @@ import efub.assignment.community.member.dto.request.MemberUpdateRequestDto;
 import efub.assignment.community.member.dto.response.MemberCreateResponseDto;
 import efub.assignment.community.member.dto.response.MemberResponseDto;
 import efub.assignment.community.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,8 @@ public class MemberController {
 
     //회원 생성 POST /members
     @PostMapping
-    public ResponseEntity<MemberCreateResponseDto> createMember(@RequestBody MemberCreateRequestDto requestDto){
+    public ResponseEntity<MemberCreateResponseDto> createMember(
+            @RequestBody @Valid MemberCreateRequestDto requestDto){
         MemberCreateResponseDto responseDto = memberService.createMember(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -33,9 +35,11 @@ public class MemberController {
 
     //회원 수정 PATCH /members/{memberId}
     @PatchMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable("memberId") Long memberId, @RequestBody MemberUpdateRequestDto requestDto){
-            MemberResponseDto responseDto = memberService.updateMember(memberId, requestDto);
-            return ResponseEntity.ok(responseDto);
+    public ResponseEntity<MemberResponseDto> updateMember(
+            @PathVariable Long memberId,
+            @RequestBody @Valid MemberUpdateRequestDto requestDto){
+        MemberResponseDto responseDto = memberService.updateMember(memberId, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     //회원 삭제 DELETE /members/{memberId}
