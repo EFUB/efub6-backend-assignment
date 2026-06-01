@@ -49,7 +49,7 @@ public class PostService {
                 .map(PostSummary::from)
                 .toList();
 
-        return new PostListResponse(postSummaries, (long) postSummaries.size());
+        return PostListResponse.of(postSummaries);
     }
 
     @Transactional(readOnly = true)

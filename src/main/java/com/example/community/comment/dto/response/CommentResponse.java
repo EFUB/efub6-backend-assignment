@@ -9,19 +9,18 @@ public record CommentResponse(
         String content,
         Boolean isAnonymous,
         Long postId,
-        Long memberId,
         String nickname,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static CommentResponse from(Comment comment) {
+        boolean anonymous = comment.getIsAnonymous();
         return new CommentResponse(
-                comment.getId(),
+                comment.getCommentId(),
                 comment.getContent(),
-                comment.getIsAnonymous(),
+                anonymous,
                 comment.getPost().getPostId(),
-                comment.getWriter().getMemberId(),
-                comment.getIsAnonymous() ? "익명" : comment.getWriter().getNickname(),
+                anonymous ? "익명" : comment.getWriter().getNickname(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt()
         );

@@ -40,7 +40,7 @@ public class BoardService {
                 .stream()
                 .map(BoardSummary::from)
                 .toList();
-        return new BoardListResponse(boardSummaries, (long) boardSummaries.size());
+        return BoardListResponse.of(boardSummaries);
     }
 
     @Transactional(readOnly = true)

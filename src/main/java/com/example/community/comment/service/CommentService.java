@@ -82,7 +82,7 @@ public class CommentService {
                 .map(CommentResponse::from)
                 .toList();
 
-        return new CommentListResponse(comments, (long) comments.size());
+        return CommentListResponse.of(comments);
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +93,7 @@ public class CommentService {
                 .map(CommentResponse::from)
                 .toList();
 
-        return new CommentListResponse(comments, (long) comments.size());
+        return CommentListResponse.of(comments);
     }
 
     private Comment findByCommentId(Long commentId) {
