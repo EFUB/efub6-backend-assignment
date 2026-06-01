@@ -44,14 +44,12 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostListResponse getAllPosts(Long boardId) {
         List<PostSummary> postSummaries = postRepository
-                .findAllByBoard_BoardIdOrderByCreatedAtDesc(boardId)
+                .findAllByBoardBoardIdOrderByCreatedAtDesc(boardId)
                 .stream()
                 .map(PostSummary::from)
                 .toList();
 
-        long count = postRepository.countByBoard_BoardId(boardId);
-
-        return new PostListResponse(postSummaries, count);
+        return new PostListResponse(postSummaries, (long) postSummaries.size());
     }
 
     @Transactional(readOnly = true)
@@ -105,6 +103,7 @@ public class PostService {
         postLikeRepository.delete(postLike);
     }
 
+    @Transactional(readOnly = true)
     public Post findByPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));

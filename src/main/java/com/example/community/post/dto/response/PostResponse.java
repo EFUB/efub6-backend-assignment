@@ -11,21 +11,20 @@ public record PostResponse(
         Boolean isAnonymous,
         Long boardId,
         String boardName,
-        Long memberId,
         String nickname,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static PostResponse from(Post post) {
+        boolean anonymous = post.getIsAnonymous();
         return new PostResponse(
-                post.getId(),
+                post.getPostId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getIsAnonymous(),
+                anonymous,
                 post.getBoard().getBoardId(),
                 post.getBoard().getName(),
-                post.getWriter().getMemberId(),
-                post.getWriter().getNickname(),
+                anonymous ? "익명" : post.getWriter().getNickname(),
                 post.getCreatedAt(),
                 post.getUpdatedAt()
         );

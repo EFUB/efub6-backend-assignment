@@ -78,7 +78,7 @@ public class CommentService {
     public CommentListResponse getCommentsByPost(Long postId) {
         postService.findByPostId(postId);
 
-        List<CommentResponse> comments = commentRepository.findAllByPostIdOrderByCreatedAtDesc(postId).stream()
+        List<CommentResponse> comments = commentRepository.findAllByPostPostIdOrderByCreatedAtDesc(postId).stream()
                 .map(CommentResponse::from)
                 .toList();
 

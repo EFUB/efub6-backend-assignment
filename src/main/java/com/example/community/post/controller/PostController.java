@@ -43,26 +43,26 @@ public class PostController {
     // 글 수정
     @PatchMapping("/posts/{postId}")
     public ResponseEntity<Void> updatePostContent(@PathVariable Long postId,
-                                                  @RequestHeader("Auth-Id") Long accountId,
+                                                  @RequestHeader("Auth-Id") Long memberId,
                                                   @Valid @RequestBody UpdatePostRequest request) {
-        postService.updatePostContent(postId, accountId, request);
+        postService.updatePostContent(postId, memberId, request);
         return ResponseEntity.noContent().build();
     }
 
     // 글 삭제
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId,
-                                           @RequestHeader("Auth-Id") Long accountId) {
-        postService.deletePost(postId, accountId);
+                                           @RequestHeader("Auth-Id") Long memberId) {
+        postService.deletePost(postId, memberId);
         return ResponseEntity.noContent().build();
     }
 
     // 글 좋아요 생성
     @PostMapping("/posts/{postId}/likes")
-    public ResponseEntity<String> createPostLike(@PathVariable Long postId,
-                                                 @RequestHeader("Auth-Id") Long memberId) {
+    public ResponseEntity<Void> createPostLike(@PathVariable Long postId,
+                                               @RequestHeader("Auth-Id") Long memberId) {
         postService.createPostLike(postId, memberId);
-        return ResponseEntity.status(HttpStatus.CREATED).body("좋아요를 눌렀습니다");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // 글 좋아요 삭제

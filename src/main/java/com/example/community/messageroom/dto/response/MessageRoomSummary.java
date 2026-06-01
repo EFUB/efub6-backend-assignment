@@ -16,7 +16,7 @@ public record MessageRoomSummary(
     public static MessageRoomSummary from(MessageRoom messageRoom, Message latestMessage, Long memberId) {
         Post post = messageRoom.getPost();
         MessageRoomPostSummary postSummary = post != null
-                ? new MessageRoomPostSummary(post.getId(), post.getTitle())
+                ? new MessageRoomPostSummary(post.getPostId(), post.getTitle())
                 : null;
 
         return new MessageRoomSummary(

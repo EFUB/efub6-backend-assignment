@@ -13,7 +13,7 @@ public interface MessageRoomRepository extends JpaRepository<MessageRoom, Long> 
     // 특정 게시글에서 두 회원 사이의 쪽지방 조회
     @Query("""
             SELECT mr FROM MessageRoom mr
-            WHERE mr.post.id = :postId
+            WHERE mr.post.postId = :postId
             AND (
                 (mr.sender.memberId = :memberId1 AND mr.receiver.memberId = :memberId2)
                 OR (mr.sender.memberId = :memberId2 AND mr.receiver.memberId = :memberId1)

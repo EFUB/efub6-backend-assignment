@@ -2,12 +2,15 @@ package com.example.community.board.domain;
 
 import com.example.community.global.domain.BaseEntity;
 import com.example.community.member.domain.Member;
+import com.example.community.post.domain.Post;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +33,9 @@ public class Board extends BaseEntity {
 
     @Column(length = 255)
     private String notice;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     @Builder
     public Board(Member owner, String name, String description, String notice) {

@@ -19,7 +19,7 @@ public record CommentResponse(
                 comment.getId(),
                 comment.getContent(),
                 comment.getIsAnonymous(),
-                comment.getPost().getId(),
+                comment.getPost().getPostId(),
                 comment.getWriter().getMemberId(),
                 comment.getIsAnonymous() ? "익명" : comment.getWriter().getNickname(),
                 comment.getCreatedAt(),
