@@ -1,7 +1,6 @@
 package com.example.community.member.domain;
 
 import com.example.community.global.domain.BaseEntity;
-import com.example.community.member.dto.request.UpdateMemberRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,9 +44,9 @@ public class Member extends BaseEntity {
         this.status = MemberStatus.REGISTER;
     }
 
-    public void updateProfile(UpdateMemberRequestDto dto) {
-        if (dto.email() != null)      this.email = dto.email();
-        if (dto.nickname() != null)   this.nickname = dto.nickname();
+    public void updateProfile(String email, String nickname) {
+        if (email != null)    this.email = email;
+        if (nickname != null) this.nickname = nickname;
     }
 
     public void changeStatus(MemberStatus status) {
