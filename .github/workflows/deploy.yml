@@ -27,7 +27,7 @@ jobs:
       - name: Make application.yml
         run: |
           mkdir -p community/src/main/resources
-          echo "${{ secrets.APPLICATION }}" > /community/src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" > community/src/main/resources/application.yml
 
       # Gradle 캐시 사용
       # 의존성 다운로드 시간을 줄여 빌드 속도 향상
