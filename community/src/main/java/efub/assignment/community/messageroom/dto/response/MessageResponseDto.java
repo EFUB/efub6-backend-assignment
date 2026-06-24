@@ -18,7 +18,6 @@ public class MessageResponseDto {
     private String content;
     private LocalDateTime createdAt;
     @JsonInclude(JsonInclude.Include.NON_NULL) //아래를 생성 후 응답때 뺄 방법...?
-    private Boolean isMine;
 
     public static MessageResponseDto of (Message message) {
         return builder()
@@ -35,7 +34,6 @@ public class MessageResponseDto {
                 .messageRoomId(message.getMessageRoom().getId())
                 .senderId(message.getSender().getMemberId())
                 .createdAt(message.getCreatedAt())
-                .isMine(isMine)
                 .build();
     }
 }

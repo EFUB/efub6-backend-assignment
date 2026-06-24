@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Board extends BaseEntity {
 
     @Id
-    @GeneratedValue (strategy =  GenerationType.AUTO)
+    @GeneratedValue (strategy =  GenerationType.IDENTITY)
     private Long boardId;
 
     @ManyToOne(fetch = FetchType.LAZY)

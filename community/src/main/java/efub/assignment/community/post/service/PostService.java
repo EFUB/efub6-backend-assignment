@@ -43,8 +43,9 @@ public class PostService {
 
     @Transactional
     public PostResponseDto getPost(Long postId) {
-        postRepository.increaseViewCount(postId);
         Post post = findByPostId(postId);
+        postRepository.increaseViewCount(postId);
+        post = findByPostId(postId);
 
         return PostResponseDto.from(post);
     }
@@ -83,7 +84,7 @@ public class PostService {
         Member member = memberService.findByMemberId(memberId);
 
         if(postLikeRepository.existsByPostAndMember(post, member)) {
-            throw new CustomException(ErrorCode.LIKE_ALREADY_EXISTS);
+            throw new CustomException(ErrorCode.POST_LIKE_ALREADY_EXISTS);
         }
 
         PostLike like = PostLike.builder()
@@ -100,7 +101,7 @@ public class PostService {
         Member member = memberService.findByMemberId(memberId);
 
         PostLike like = postLikeRepository.findByPostAndMember(post, member)
-                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_LIKE_NOT_FOUND));
         postLikeRepository.delete(like);
     }
 

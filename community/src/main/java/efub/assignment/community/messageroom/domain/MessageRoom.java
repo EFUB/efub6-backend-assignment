@@ -18,7 +18,7 @@ import java.util.List;
 public class MessageRoom extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "messageroom_id")
+    @Column(name = "message_room_id")
     private Long id;
 
     @ManyToOne (fetch = FetchType.LAZY)

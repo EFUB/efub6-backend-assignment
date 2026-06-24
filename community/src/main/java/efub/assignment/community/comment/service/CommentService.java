@@ -11,10 +11,10 @@ import efub.assignment.community.comment.repository.CommentRepository;
 import efub.assignment.community.global.exception.CustomException;
 import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
-import efub.assignment.community.member.dto.response.MemberCommentResponse;
+import efub.assignment.community.comment.dto.response.MemberCommentResponse;
 import efub.assignment.community.member.service.MemberService;
 import efub.assignment.community.post.domain.Post;
-import efub.assignment.community.post.dto.response.PostCommentResponse;
+import efub.assignment.community.comment.dto.response.PostCommentResponse;
 import efub.assignment.community.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,7 +89,7 @@ public class CommentService {
         Member member = memberService.findByMemberId(memberId);
 
         if (commentLikeRepository.existsByCommentAndMember(comment, member)){
-            throw new CustomException(ErrorCode.LIKE_ALREADY_EXISTS);
+            throw new CustomException(ErrorCode.COMMENT_LIKE_ALREADY_EXISTS);
         }
 
         CommentLike like = CommentLike.builder()
@@ -106,7 +106,7 @@ public class CommentService {
         Member member = memberService.findByMemberId(memberId);
 
         CommentLike like = commentLikeRepository.findByCommentAndMember(comment, member)
-                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_LIKE_NOT_FOUND));
 
         commentLikeRepository.delete(like);
     }

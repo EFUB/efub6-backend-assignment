@@ -20,19 +20,20 @@ public class AlarmService {
     private final MemberService memberService;
 
     @Transactional
-    public void createAlarm (AlarmType type, Member receiver, String postTitle, String content) {
+    public void createAlarm (AlarmType type, Member receiver, String boardTitle, String content) {
         Alarm alarm = Alarm.builder()
                 .type(type)
                 .receiver(receiver)
-                .boardTitle(postTitle)
+                .boardTitle(boardTitle)
                 .content(content)
                 .build();
 
         alarmRepository.save(alarm);
     }
 
-    public AlarmListDto getAlarmList(Long requesterId) {
-        Member requester = memberService.findByMemberId(requesterId);
+    @Transactional(readOnly = true)
+    public AlarmListDto getAlarmList(Long receiver) {
+        Member requester = memberService.findByMemberId(receiver);
         List<Alarm> alarmList = alarmRepository.findAllByReceiver(requester);
 
         return AlarmListDto.of(alarmList);

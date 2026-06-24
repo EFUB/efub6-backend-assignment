@@ -40,10 +40,10 @@ public class BoardService {
 
     // [게시판 주인 수정]
     @Transactional
-    public void updateBoardOwner(Long boardId, Long memberId, BoardUpdateRequest request) {
+    public void updateBoardOwner(Long boardId, Long requesterMemberId, BoardUpdateRequest request) {
         Board board = findByBoardId(boardId);
         Member newOwner = memberService.findByMemberId(request.getMemberId());
-        Member requestMember = memberService.findByMemberId(memberId);
+        Member requestMember = memberService.findByMemberId(requesterMemberId);
 
         authorizeBoardOwner(board,requestMember);
         board.changeBoardOwner(newOwner);
@@ -64,7 +64,7 @@ public class BoardService {
     }
 
     public void authorizeBoardOwner (Board board, Member member) {
-        if(!board.getBoardOwner().equals(member)){
+        if(!board.getBoardOwner().getMemberId().equals(member.getMemberId())){
             throw new CustomException(ErrorCode.BOARD_ACCOUNT_MISTMATCH);
         }
     }

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "member")
+@Table(name = "members")
 //파라미터가 없는 기본 생성자를 자동으로 만들어줌
 //기본 생성자의 접근권한을 protected로 제한.
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,7 +29,7 @@ public class Member {
     @Column(nullable = false)
     private String nickname;
 
-    @Column
+    @Column (nullable = false)
     private String university;
 
     @Column(nullable = false, unique = true)

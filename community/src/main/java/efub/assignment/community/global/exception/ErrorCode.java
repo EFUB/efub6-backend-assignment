@@ -22,11 +22,13 @@ public enum ErrorCode {
     BOARD_ACCOUNT_MISTMATCH(401, "게시판 주인이 아닙니다."),
     COMMENT_NOT_FOUND(404, "해당 id의 댓글이 존재하지 않습니다."),
     COMMENT_ACCOUNT_MISMATCH(401, "댓글의 주인이 아닙니다"),
-    LIKE_ALREADY_EXISTS(400, "좋아요가 이미 존재합니다."),
-    LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다."),
+    POST_LIKE_ALREADY_EXISTS(400, "게시글에 이미 좋아요를 눌렀습니다"),
+    POST_LIKE_NOT_FOUND(404, "게시글에 좋아요가 존재하지 않습니다"),
+    COMMENT_LIKE_ALREADY_EXISTS(400, "좋아요가 이미 존재합니다."),
+    COMMENT_LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다."),
     MESSAGEROOM_ALREADY_EXISTS(400, "쪽지방이 이미 존재합니다."),
     MESSAGEROOM_NOT_FOUND(404, "쪽지방이 존재하지 않습니다."),
-    MESSAGEROOM_MEMBER_MISTMATCH(401, "쪽지방의 주인이 아닙니다.");
+    MESSAGEROOM_MEMBER_MISMATCH(401, "쪽지방의 주인이 아닙니다.");
 
     private final int status;
     private final String message;

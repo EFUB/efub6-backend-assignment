@@ -8,8 +8,8 @@ import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.service.MemberService;
 import efub.assignment.community.messageroom.domain.Message;
 import efub.assignment.community.messageroom.domain.MessageRoom;
-import efub.assignment.community.messageroom.dto.request.MessageRoomRequest;
-import efub.assignment.community.messageroom.dto.request.MessageRoomCreateDto;
+import efub.assignment.community.messageroom.dto.request.MessageRoomRequestDto;
+import efub.assignment.community.messageroom.dto.request.CreateMessageRoomDto;
 import efub.assignment.community.messageroom.dto.response.CheckMessageRoomDto;
 import efub.assignment.community.messageroom.dto.response.MessageRoomDto;
 import efub.assignment.community.messageroom.dto.response.MessageRoomListDto;
@@ -32,13 +32,12 @@ public class MessageRoomService {
     private final AlarmService alarmService;
 
     @Transactional
-    public MessageRoomDto createMessageRoom(Long requesterId, MessageRoomCreateDto request) {
+    public MessageRoomDto createMessageRoom(Long requesterId, CreateMessageRoomDto request) {
         Member requester = memberService.findByMemberId(requesterId);
         Member target = memberService.findByMemberId(request.getTargetId());
         Post post = postService.findByPostId(request.getPostId());
 
-        if (messageRoomRepository.existsByPostAndCreatorAndTarget(post, requester, target) ||
-                messageRoomRepository.existsByPostAndCreatorAndTarget(post, target, requester)){
+        if (messageRoomRepository.existsMessageRoomBetweenMembers(post,requester,target)){
             throw new CustomException(ErrorCode.MESSAGEROOM_ALREADY_EXISTS);
         }
 
@@ -57,11 +56,12 @@ public class MessageRoomService {
 
         messageRoomRepository.save(messageRoom);
 
-        alarmService.createAlarm(AlarmType.MESSAGEROOM, target, "쪽지방", "새로운 쪽지방이 생겼어요");
+        alarmService.createAlarm(AlarmType.MESSAGE_ROOM, target, "쪽지방", "새로운 쪽지방이 생겼어요");
 
         return MessageRoomDto.of(messageRoom);
     }
 
+    @Transactional(readOnly = true)
     public MessageRoomListDto getMessageRoomList(Long requesterID) {
         Member requester = memberService.findByMemberId(requesterID);
         List<MessageRoom> messageRoomList = messageRoomRepository.findAllByCreatorOrTarget(requester, requester);
@@ -69,19 +69,20 @@ public class MessageRoomService {
         return MessageRoomListDto.of(messageRoomList);
     }
 
-    public CheckMessageRoomDto checkMessageRoomExist(Long requesterId, MessageRoomRequest request) {
+    @Transactional(readOnly = true)
+    public CheckMessageRoomDto checkMessageRoomExist(Long requesterId, MessageRoomRequestDto request) {
         Member requester = memberService.findByMemberId(requesterId);
         Member receiver = memberService.findByMemberId(request.getReceiverId());
         Post post = postService.findByPostId(request.getPostId());
 
-        MessageRoom messageRoom = messageRoomRepository.findByPostAndMember(post, requester)
+        MessageRoom messageRoom = messageRoomRepository.findByPostAndMembers(post, requester, receiver)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGEROOM_NOT_FOUND));
 
         return CheckMessageRoomDto.of(messageRoom);
     }
 
     @Transactional
-    public void deleteMessageRoom(Long requesterId, MessageRoomRequest request) {
+    public void deleteMessageRoom(Long requesterId, MessageRoomRequestDto request) {
         Member requester = memberService.findByMemberId(requesterId);
         Post post = postService.findByPostId(request.getPostId());
 
@@ -94,7 +95,7 @@ public class MessageRoomService {
 
     public void authorizeMessageRoomMember(MessageRoom messageRoom, Member requester) {
         if(!messageRoom.getCreator().equals(requester) && !messageRoom.getTarget().equals(requester)){
-            throw new CustomException(ErrorCode.MESSAGEROOM_MEMBER_MISTMATCH);
+            throw new CustomException(ErrorCode.MESSAGEROOM_MEMBER_MISMATCH);
         }
     }
 
