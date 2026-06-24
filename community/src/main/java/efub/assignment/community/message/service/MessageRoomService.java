@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class MessageRoomService {
             throw new CustomException(ErrorCode.MESSAGE_TO_SELF_NOT_ALLOWED);
         }
 
-        if (messageRoomRepository.existsBySenderAndReceiverAndPost(sender, receiver, post)) {
+        if (messageRoomRepository.existsByMembersAndPost(sender, receiver, post)) {
             throw new CustomException(ErrorCode.MESSAGE_ROOM_ALREADY_EXISTS);
         }
 
@@ -81,7 +82,7 @@ public class MessageRoomService {
         Post post = postService.findByPostId(postId);
 
         MessageRoom messageRoom = messageRoomRepository
-                .findBySenderAndReceiverAndPost(sender, receiver, post)
+                .findByMembersAndPost(sender, receiver, post)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
 
         return MessageRoomExistResponse.from(messageRoom);
@@ -93,11 +94,11 @@ public class MessageRoomService {
         Member member = memberService.findByMemberId(memberId);
 
         List<MessageRoomSummary> messageRooms = messageRoomRepository
-                .findAllBySenderOrReceiver(member, member)
+                .findAllByMemberFetchJoin(member)
                 .stream()
                 .map(messageRoom -> {
-                    Message lastMessage = messageRepository
-                            .findTopByMessageRoomOrderByCreatedAtDesc(messageRoom)
+                    Message lastMessage = messageRoom.getMessages().stream()
+                            .max(Comparator.comparing(Message::getCreatedAt))
                             .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
                     return MessageRoomSummary.from(messageRoom, lastMessage);
@@ -119,7 +120,6 @@ public class MessageRoomService {
 
         validateMessageRoomMember(messageRoom, member);
 
-        messageRepository.deleteAllByMessageRoom(messageRoom);
         messageRoomRepository.delete(messageRoom);
     }
 

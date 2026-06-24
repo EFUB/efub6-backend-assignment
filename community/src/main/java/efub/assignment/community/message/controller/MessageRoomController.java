@@ -37,7 +37,7 @@ public class MessageRoomController {
 
     //쪽지방 여부 조회
     @GetMapping("/message-rooms/exist")
-    public ResponseEntity<?> existMessageRoom(
+    public ResponseEntity<MessageRoomExistResponse> existMessageRoom(
             @RequestHeader("Auth-id") Long memberId,
             @RequestParam Long receiverId,
             @RequestParam Long postId
@@ -49,9 +49,9 @@ public class MessageRoomController {
     }
 
     //쪽지방 목록 조회
-    @GetMapping("/message-rooms/{memberId}")
+    @GetMapping("/message-rooms")
     public ResponseEntity<MessageRoomListResponse> getMessageRooms(
-            @PathVariable Long memberId
+            @RequestHeader("Auth-id") Long memberId
     ) {
         MessageRoomListResponse response = messageRoomService.getMessageRooms(memberId);
         return ResponseEntity.ok(response);

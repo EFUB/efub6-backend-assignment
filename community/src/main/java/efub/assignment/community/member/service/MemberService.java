@@ -39,13 +39,15 @@ public class MemberService {
     }
 
     //멤버 수정
+    //멤버 수정
     @Transactional
     public MemberResponseDto updateMember(Long memberId, MemberUpdateRequestDto requestDto){
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+
         member.updateMember(requestDto.getNickname(), requestDto.getEmail(), requestDto.getPassword());
-        Member updateMember = memberRepository.save(member);
-        return MemberResponseDto.from(updateMember);
+
+        return MemberResponseDto.from(member);
     }
 
     //멤버 삭제(물리적 삭제-Delete)

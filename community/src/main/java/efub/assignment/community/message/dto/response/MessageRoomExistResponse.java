@@ -5,14 +5,15 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class MessageRoomExistResponse {
 
-    private Long messageRoomId;
+    private final Long messageRoomId;
+
+    public MessageRoomExistResponse(Long messageRoomId) {
+        this.messageRoomId = messageRoomId;
+    }
 
     public static MessageRoomExistResponse from(MessageRoom messageRoom) {
-        return MessageRoomExistResponse.builder()
-                .messageRoomId(messageRoom.getMessageRoomId())
-                .build();
+        return new MessageRoomExistResponse(messageRoom.getMessageRoomId());
     }
 }
