@@ -11,6 +11,7 @@ import efub.assignment.community.message.dto.response.MessageListResponseDto;
 import efub.assignment.community.message.dto.summary.MessageSummaryDto;
 import efub.assignment.community.message.repository.MessageRepository;
 import efub.assignment.community.messageRoom.domain.MessageRoom;
+import efub.assignment.community.messageRoom.repository.MessageRoomRepository;
 import efub.assignment.community.messageRoom.service.MessageRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ import java.util.List;
 public class MessageService {
 
     private final MessageRepository messageRepository;
-    private final MessageRoomService messageRoomService;
     private final MemberRepository memberRepository;
+    private final MessageRoomRepository messageRoomRepository;
 
     // 쪽지 생성
     @Transactional
@@ -34,7 +35,8 @@ public class MessageService {
             Long senderId,
             CreateMessageRequestDto requestDto
     ) {
-        MessageRoom messageRoom = messageRoomService.findByMessageRoomId(messageRoomId);
+        MessageRoom messageRoom = messageRoomRepository.findById(messageRoomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
 
         Member sender = memberRepository.findById(senderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -54,17 +56,18 @@ public class MessageService {
 
     // 특정 쪽지방의 모든 메시지 조회
     public MessageListResponseDto getMessages(Long messageRoomId, Long memberId) {
-        MessageRoom messageRoom = messageRoomService.findByMessageRoomId(messageRoomId);
+        MessageRoom messageRoom = messageRoomRepository.findById(messageRoomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
 
         memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         authorizeMessageRoomParticipant(messageRoom, memberId);
 
-        Long otherMemberId = getOtherMemberId(messageRoom, memberId);
+        Long otherMemberId = messageRoom.getPartnerId(memberId);
 
         List<MessageSummaryDto> messages = messageRepository
-                .findAllByMessageRoomOrderByCreatedAtAsc(messageRoom)
+                .findAllByMessageRoomWithSenderOrderByCreatedAtAsc(messageRoom)
                 .stream()
                 .map(message -> MessageSummaryDto.from(message, memberId))
                 .toList();
@@ -77,18 +80,17 @@ public class MessageService {
     }
 
     private void authorizeMessageRoomParticipant(MessageRoom messageRoom, Long memberId) {
-        boolean isSender = messageRoom.getSender().getMemberId().equals(memberId);
-        boolean isReceiver = messageRoom.getReceiver().getMemberId().equals(memberId);
-
-        if (!isSender && !isReceiver) {
+        if (!messageRoom.isParticipant(memberId)) {
             throw new CustomException(ErrorCode.MESSAGE_ROOM_ACCESS_DENIED);
         }
     }
+    public void createFirstMessage(MessageRoom messageRoom, Member sender, String content) {
+        Message firstMessage = Message.builder()
+                .messageRoom(messageRoom)
+                .sender(sender)
+                .content(content)
+                .build();
 
-    private Long getOtherMemberId(MessageRoom messageRoom, Long memberId) {
-        if (messageRoom.getSender().getMemberId().equals(memberId)) {
-            return messageRoom.getReceiver().getMemberId();
-        }
-        return messageRoom.getSender().getMemberId();
+        messageRepository.save(firstMessage);
     }
 }

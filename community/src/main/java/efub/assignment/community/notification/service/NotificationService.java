@@ -30,12 +30,15 @@ public class NotificationService {
     }
 
     @Transactional
-    public void createCommentNotification(Member receiver, String boardName, String commentContent) {
+    public void createCommentNotification(Long receiverId, String boardName, String commentContent) {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
         Notification notification = Notification.builder()
                 .member(receiver)
-                .type(NotificationType.COMMENT)
+                .type(NotificationType.NEW_COMMENT_ON_POST)
                 .boardName(boardName)
-                .content("새로운 댓글이 달렸어요: " + commentContent)
+                .content(NotificationType.NEW_COMMENT_ON_POST.getMessage() + commentContent)
                 .build();
 
         notificationRepository.save(notification);
@@ -45,9 +48,9 @@ public class NotificationService {
     public void createMessageRoomNotification(Member receiver) {
         Notification notification = Notification.builder()
                 .member(receiver)
-                .type(NotificationType.MESSAGE_ROOM)
+                .type(NotificationType.NEW_MESSAGE_ROOM_CREATED)
                 .boardName(null)
-                .content("새로운 쪽지방이 생겼어요")
+                .content(NotificationType.NEW_MESSAGE_ROOM_CREATED.getMessage())
                 .build();
 
         notificationRepository.save(notification);

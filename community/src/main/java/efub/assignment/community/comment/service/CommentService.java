@@ -15,7 +15,9 @@ import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;import org.springframework.context.ApplicationEventPublisher;
+import efub.assignment.community.notification.event.CommentCreatedEvent;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class CommentService {
     private final PostService postService;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 댓글 생성
     public CommentResponseDto createComment(Long postId, CreateCommentRequestDto requestDto) {
@@ -36,11 +39,11 @@ public class CommentService {
         Comment savedComment = commentRepository.save(comment);
 
         // 알림 생성
-        notificationService.createCommentNotification(
-                post.getMember(),
+        eventPublisher.publishEvent(new CommentCreatedEvent(
+                post.getMember().getMemberId(),
                 post.getBoard().getBoardName(),
                 savedComment.getContent()
-        );
+        ));
 
         return CommentResponseDto.from(savedComment);
     }

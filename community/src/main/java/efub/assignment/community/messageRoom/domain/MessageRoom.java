@@ -28,23 +28,31 @@ public class MessageRoom extends BaseEntity {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id",nullable = false)
-    private Member sender;
+    @JoinColumn(name = "creator_id",nullable = false)
+    private Member creator;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id",nullable = false)
-    private Member receiver;
-
-    @OneToMany(mappedBy = "messageRoom",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    private List<Message> messages = new ArrayList<>();
+    @JoinColumn(name = "participant_id",nullable = false)
+    private Member participant;
 
     @Builder
-    public MessageRoom(Post post,Member sender,Member receiver){
+    public MessageRoom(Post post,Member creator,Member participant){
         this.post = post;
-        this.sender = sender;
-        this.receiver = receiver;
+        this.creator = creator;
+        this.participant = participant;
+    }
+
+    public boolean isParticipant(Long memberId) {
+        return creator.getMemberId().equals(memberId)
+                || participant.getMemberId().equals(memberId);
+    }
+
+    public Long getPartnerId(Long memberId) {
+        if (creator.getMemberId().equals(memberId)) {
+            return participant.getMemberId();
+        }
+
+        return creator.getMemberId();
     }
 
 }

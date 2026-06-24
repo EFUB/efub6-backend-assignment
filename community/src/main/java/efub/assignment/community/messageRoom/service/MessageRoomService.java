@@ -6,6 +6,7 @@ import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.message.domain.Message;
 import efub.assignment.community.message.repository.MessageRepository;
+import efub.assignment.community.message.service.MessageService;
 import efub.assignment.community.messageRoom.domain.MessageRoom;
 import efub.assignment.community.messageRoom.dto.request.CreateMessageRoomRequestDto;
 import efub.assignment.community.messageRoom.dto.response.CreateMessageRoomResponseDto;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,72 +35,74 @@ public class MessageRoomService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final MessageRoomRepository messageRoomRepository;
-    private final MessageRepository messageRepository;
+    private final MessageService messageService;
     private final NotificationService notificationService;
+    private final MessageRepository messageRepository;
 
     // 쪽지방 생성
     @Transactional
-    public CreateMessageRoomResponseDto createMessageRoom(CreateMessageRoomRequestDto requestDto) {
+    public CreateMessageRoomResponseDto createMessageRoom(Long creatorId, CreateMessageRoomRequestDto requestDto) {
+        if (creatorId.equals(requestDto.receiverId())) {
+            throw new CustomException(ErrorCode.MESSAGE_ROOM_SELF_NOT_ALLOWED);
+        }
 
-        Member sender = memberRepository.findById(requestDto.senderId())
+        Member creator = memberRepository.findById(creatorId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        Member receiver = memberRepository.findById(requestDto.receiverId())
+        Member participant = memberRepository.findById(requestDto.receiverId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Post post = postRepository.findById(requestDto.postId())
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        // 자기 자신에게 쪽지 불가
-        if (sender.getMemberId().equals(receiver.getMemberId())) {
-            throw new CustomException(ErrorCode.MESSAGE_ROOM_SELF_NOT_ALLOWED);
-        }
-
         // 이미 존재하는 쪽지방 체크
-        messageRoomRepository.findBySenderAndReceiverAndPost(sender, receiver, post)
+        messageRoomRepository.findByParticipantsAndPost(creator,participant,post)
                 .ifPresent(messageRoom -> {
                     throw new CustomException(ErrorCode.MESSAGE_ROOM_ALREADY_EXISTS);
                 });
 
         // 쪽지방 생성
         MessageRoom messageRoom = MessageRoom.builder()
-                .sender(sender)
-                .receiver(receiver)
+                .creator(creator)
+                .participant(participant)
                 .post(post)
                 .build();
 
         MessageRoom savedRoom = messageRoomRepository.save(messageRoom);
 
         // 첫 메시지 저장
-        Message firstMessage = Message.builder()
-                .messageRoom(savedRoom)
-                .sender(sender)
-                .content(requestDto.content())
-                .build();
+        messageService.createFirstMessage(savedRoom, creator, requestDto.content());
 
-        messageRepository.save(firstMessage);
         // 알림 생성
-        notificationService.createMessageRoomNotification(receiver);
+        notificationService.createMessageRoomNotification(participant);
 
         return CreateMessageRoomResponseDto.of(savedRoom, requestDto.content());
     }
 
-    public MessageRoomListResponseDto getMessageRoomByMember(Long memberId) {
+    public MessageRoomListResponseDto getMessageRoomByMember(
+            Long authId,
+            Long memberId
+    ) {
+        if (!authId.equals(memberId)) {
+            throw new CustomException(ErrorCode.MESSAGE_ROOM_ACCESS_DENIED);
+        }
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<MessageRoomSummaryDto> messageRooms = messageRoomRepository
-                .findAllBySenderOrReceiver(member, member)
+                .findAllByCreatorOrParticipant(member, member)
                 .stream()
                 .map(messageRoom -> {
-                    String latestContent = messageRepository
-                            .findTopByMessageRoomOrderByCreatedAtDesc(messageRoom)
-                            .map(message -> message.getContent())
+                    Optional<Message> latestMessage =
+                            messageRepository.findTopByMessageRoomOrderByCreatedAtDesc(messageRoom);
+
+                    String latestContent = latestMessage
+                            .map(Message::getContent)
                             .orElse(null);
 
-                    LocalDateTime latestCreatedAt = messageRepository
-                            .findTopByMessageRoomOrderByCreatedAtDesc(messageRoom)
-                            .map(message -> message.getCreatedAt())
+                    LocalDateTime latestCreatedAt = latestMessage
+                            .map(Message::getCreatedAt)
                             .orElse(null);
 
                     return new MessageRoomSummaryDto(
@@ -112,25 +116,32 @@ public class MessageRoomService {
         return new MessageRoomListResponseDto(messageRooms);
     }
 
-    public MessageRoomCheckResponseDto checkMessageRoom(Long senderId, Long receiverId, Long postId) {
-        Member sender = memberRepository.findById(senderId)
+    public MessageRoomCheckResponseDto getMessageRoom(Long senderId, Long receiverId, Long postId) {
+        Member creator = memberRepository.findById(senderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        Member receiver = memberRepository.findById(receiverId)
+        Member participant = memberRepository.findById(receiverId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        MessageRoom messageRoom = messageRoomRepository.findBySenderAndReceiverAndPost(sender, receiver, post)
+        MessageRoom messageRoom = messageRoomRepository.findByParticipantsAndPost(creator, participant, post)
                 .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_ROOM_NOT_FOUND));
 
         return new MessageRoomCheckResponseDto(messageRoom.getMessageRoomId());
     }
 
+
     @Transactional
-    public void deleteMessageRoom(Long messageRoomId) {
+    public void deleteMessageRoom(Long messageRoomId, Long memberId) {
         MessageRoom messageRoom = findByMessageRoomId(messageRoomId);
+
+        if (!messageRoom.isParticipant(memberId)) {
+            throw new CustomException(ErrorCode.MESSAGE_ROOM_ACCESS_DENIED);
+        }
+
+        messageRepository.deleteAllByMessageRoom(messageRoom);
         messageRoomRepository.delete(messageRoom);
     }
 

@@ -28,7 +28,7 @@ public class Message extends BaseEntity {
     @JoinColumn(name = "sender_id", nullable = false)
     private Member sender;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "VARCHAR")
     private String content;
 
     @Builder

@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateMessageRoomRequestDto(
-        @NotNull(message = "보낸 사람 id는 필수입니다.")
-        Long senderId,
 
         @NotNull(message = "받는 사람 id는 필수입니다.")
         Long receiverId,

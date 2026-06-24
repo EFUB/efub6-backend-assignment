@@ -12,11 +12,13 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping("/members/{memberId}/notifications")
+    @GetMapping("/notifications")
     public ResponseEntity<NotificationListResponseDto> getNotifications(
-            @PathVariable("memberId") Long memberId
+            @RequestHeader("Auth-Id") Long memberId
     ) {
-        NotificationListResponseDto responseDto = notificationService.getNotifications(memberId);
+        NotificationListResponseDto responseDto =
+                notificationService.getNotifications(memberId);
+
         return ResponseEntity.ok(responseDto);
     }
 }

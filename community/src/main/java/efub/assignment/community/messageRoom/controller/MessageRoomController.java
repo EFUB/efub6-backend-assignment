@@ -20,29 +20,36 @@ public class MessageRoomController {
     // 쪽지방 생성
     @PostMapping("/message-rooms")
     public ResponseEntity<CreateMessageRoomResponseDto> createMessageRoom(
-            @RequestBody @Valid CreateMessageRoomRequestDto requestDto){
-        CreateMessageRoomResponseDto responseDto = messageRoomService.createMessageRoom(requestDto);
+            @RequestHeader("Auth-Id") Long creatorId,
+            @RequestBody @Valid CreateMessageRoomRequestDto requestDto
+    ) {
+        CreateMessageRoomResponseDto responseDto =
+                messageRoomService.createMessageRoom(creatorId, requestDto);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     // 쪽지방 목록 조회
     @GetMapping("/members/{memberId}/message-rooms")
     public ResponseEntity<MessageRoomListResponseDto> getMessageRoomByMember(
-            @PathVariable("memberId") Long memberId)
-    {
-        MessageRoomListResponseDto responseDto = messageRoomService.getMessageRoomByMember(memberId);
+            @RequestHeader("Auth-Id") Long authId,
+            @PathVariable Long memberId
+    ) {
+        MessageRoomListResponseDto responseDto =
+                messageRoomService.getMessageRoomByMember(authId, memberId);
+
         return ResponseEntity.ok(responseDto);
     }
 
     // 쪽지방 여부 조회
-    @GetMapping("/message-rooms/check")
-    public ResponseEntity<MessageRoomCheckResponseDto> checkMessageRoom(
+    @GetMapping("/message-rooms")
+    public ResponseEntity<MessageRoomCheckResponseDto> getMessageRoom(
             @RequestParam Long senderId,
             @RequestParam Long receiverId,
             @RequestParam Long postId
     ) {
         MessageRoomCheckResponseDto responseDto =
-                messageRoomService.checkMessageRoom(senderId, receiverId, postId);
+                messageRoomService.getMessageRoom(senderId, receiverId, postId);
 
         return ResponseEntity.ok(responseDto);
     }
@@ -50,9 +57,10 @@ public class MessageRoomController {
     // 쪽지방 삭제
     @DeleteMapping("/message-rooms/{messageRoomId}")
     public ResponseEntity<Void> deleteMessageRoom(
-            @PathVariable Long messageRoomId
+            @PathVariable Long messageRoomId,
+            @RequestHeader("Auth-Id") Long memberId
     ) {
-        messageRoomService.deleteMessageRoom(messageRoomId);
+        messageRoomService.deleteMessageRoom(messageRoomId, memberId);
         return ResponseEntity.noContent().build();
     }
 }

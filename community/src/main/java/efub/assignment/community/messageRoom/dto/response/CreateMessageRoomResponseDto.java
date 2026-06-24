@@ -14,8 +14,8 @@ public record CreateMessageRoomResponseDto(
     public static CreateMessageRoomResponseDto of(MessageRoom messageRoom,String content){
         return new CreateMessageRoomResponseDto(
                 messageRoom.getMessageRoomId(),
-                messageRoom.getSender().getMemberId(),
-                messageRoom.getReceiver().getMemberId(),
+                messageRoom.getCreator().getMemberId(),
+                messageRoom.getParticipant().getMemberId(),
                 content,
                 messageRoom.getCreatedAt()
         );
