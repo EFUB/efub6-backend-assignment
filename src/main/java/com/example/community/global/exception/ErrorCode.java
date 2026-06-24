@@ -12,6 +12,7 @@ public enum ErrorCode {
 
     // member
     MEMBER_NOT_FOUND(404, "존재하는 회원이 없습니다."),
+    MEMBER_EMAIL_ALREADY_EXISTS(409, "이미 가입된 이메일입니다."),
 
     // board
     BOARD_NOT_FOUND(404, "해당 id의 게시판이 존재하지 않습니다."),

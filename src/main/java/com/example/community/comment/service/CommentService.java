@@ -78,11 +78,11 @@ public class CommentService {
     public CommentListResponse getCommentsByPost(Long postId) {
         postService.findByPostId(postId);
 
-        List<CommentResponse> comments = commentRepository.findAllByPostIdOrderByCreatedAtDesc(postId).stream()
+        List<CommentResponse> comments = commentRepository.findAllByPostPostIdOrderByCreatedAtDesc(postId).stream()
                 .map(CommentResponse::from)
                 .toList();
 
-        return new CommentListResponse(comments, (long) comments.size());
+        return CommentListResponse.of(comments);
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +93,7 @@ public class CommentService {
                 .map(CommentResponse::from)
                 .toList();
 
-        return new CommentListResponse(comments, (long) comments.size());
+        return CommentListResponse.of(comments);
     }
 
     private Comment findByCommentId(Long commentId) {

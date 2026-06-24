@@ -6,10 +6,8 @@ import com.example.community.member.domain.Member;
 import com.example.community.member.domain.MemberStatus;
 import com.example.community.member.dto.request.CreateMemberRequestDto;
 import com.example.community.member.dto.request.UpdateMemberRequestDto;
-import com.example.community.member.dto.response.CreateMemberResponseDto;
 import com.example.community.member.dto.response.MemberResponseDto;
 import com.example.community.member.repository.MemberRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,31 +22,35 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberResponseDto getMember(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         return MemberResponseDto.from(member);
     }
 
     // 회원 생성
     @Transactional
-    public CreateMemberResponseDto createMember(CreateMemberRequestDto requestDto) {
-        // 이메일 중복 검사
+    public MemberResponseDto createMember(CreateMemberRequestDto requestDto) {
         if (memberRepository.existsByEmail(requestDto.email())) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+            throw new CustomException(ErrorCode.MEMBER_EMAIL_ALREADY_EXISTS);
         }
 
         Member member = requestDto.toEntity();
         Member savedMember = memberRepository.save(member);
 
-        return CreateMemberResponseDto.from(savedMember);
+        return MemberResponseDto.from(savedMember);
     }
 
     // 회원 정보 수정
     @Transactional
-    public MemberResponseDto updateMember(Long memberId, @Valid UpdateMemberRequestDto requestDto) {
+    public MemberResponseDto updateMember(Long memberId, UpdateMemberRequestDto requestDto) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        member.updateProfile(requestDto);
+        if (requestDto.email() != null && !requestDto.email().equals(member.getEmail())
+                && memberRepository.existsByEmail(requestDto.email())) {
+            throw new CustomException(ErrorCode.MEMBER_EMAIL_ALREADY_EXISTS);
+        }
+
+        member.updateProfile(requestDto.email(), requestDto.nickname());
 
         return MemberResponseDto.from(member);
     }
@@ -57,12 +59,13 @@ public class MemberService {
     @Transactional
     public void deleteMember(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         member.changeStatus(MemberStatus.UNREGISTER);
     }
 
+    @Transactional(readOnly = true)
     public Member findByMemberId(Long memberId) {
-        return memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

@@ -42,8 +42,8 @@ public class BoardController {
     // 게시판 주인 수정
     @PatchMapping("/{boardId}")
     public ResponseEntity<Void> updateBoardOwner(@PathVariable Long boardId,
-                                                           @RequestHeader("Auth-Id") Long memberId,
-                                                           @Valid @RequestBody UpdateBoardOwnerRequest request) {
+                                                 @RequestHeader("Auth-Id") Long memberId,
+                                                 @Valid @RequestBody UpdateBoardOwnerRequest request) {
         boardService.updateBoardOwner(boardId, memberId, request);
         return ResponseEntity.noContent().build();
     }

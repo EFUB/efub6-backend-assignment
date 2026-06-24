@@ -40,7 +40,7 @@ public class BoardService {
                 .stream()
                 .map(BoardSummary::from)
                 .toList();
-        return new BoardListResponse(boardSummaries, (long) boardSummaries.size());
+        return BoardListResponse.of(boardSummaries);
     }
 
     @Transactional(readOnly = true)
@@ -69,11 +69,12 @@ public class BoardService {
     }
 
     private void authorizeBoardOwner(Board board, Member member) {
-        if(!board.getOwner().equals(member)) {
+        if (!board.getOwner().getMemberId().equals(member.getMemberId())) {
             throw new CustomException(ErrorCode.BOARD_ACCOUNT_MISMATCH);
         }
     }
 
+    @Transactional(readOnly = true)
     public Board findByBoardId(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));

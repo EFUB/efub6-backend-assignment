@@ -1,7 +1,6 @@
 package com.example.community.board.repository;
 
 import com.example.community.board.domain.Board;
-import org.apache.logging.log4j.simple.internal.SimpleProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

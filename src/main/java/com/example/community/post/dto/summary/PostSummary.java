@@ -16,7 +16,7 @@ public record PostSummary(
 ) {
     public static PostSummary from(Post post) {
         return new PostSummary(
-                post.getId(),
+                post.getPostId(),
                 post.getBoard().getBoardId(),
                 post.getIsAnonymous() ? "익명" : post.getWriter().getNickname(),
                 post.getIsAnonymous(),
