@@ -15,11 +15,5 @@ public class GetMessageRoomResponse {
                 .messageRoomId(messageRoom.getId())
                 .build();
     }
-
-    public static GetMessageRoomResponse empty() {
-        return GetMessageRoomResponse.builder()
-                .messageRoomId(null)
-                .build();
-    }
 }
 

@@ -22,7 +22,7 @@ public class MessageRoomController {
     // 쪽지방 생성
     @PostMapping
     public ResponseEntity<CreateMessageRoomResponse> createMessageRoom(@RequestHeader("Auth-Id") Long senderId,
-                                                                        @RequestBody @Valid CreateMessageRoomRequest request) {
+                                                                       @RequestBody @Valid CreateMessageRoomRequest request) {
         CreateMessageRoomResponse response = messageRoomService.createMessageRoom(senderId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -19,7 +19,8 @@ public class GetMessageListResponse {
     public static GetMessageListResponse from(MessageRoom messageRoom, List<Message> messageList, Long requesterId) {
         return GetMessageListResponse.builder()
                 .messageRoomId(messageRoom.getId())
-                .receiverId(messageRoom.getReceiver().getMemberId())
+                .receiverId(messageRoom.getReceiver().getMemberId().equals(requesterId)
+                    ? messageRoom.getSender().getMemberId() : messageRoom.getReceiver().getMemberId())
                 .messages(messageList.stream()
                         .map(message -> MessageResponse.from(message, requesterId))
                         .collect(Collectors.toList()))
