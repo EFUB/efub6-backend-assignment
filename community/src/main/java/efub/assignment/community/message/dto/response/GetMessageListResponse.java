@@ -1,6 +1,5 @@
 package efub.assignment.community.message.dto.response;
 
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
 import efub.assignment.community.message.domain.Message;
 import efub.assignment.community.messageRoom.domain.MessageRoom;
 import lombok.Builder;
