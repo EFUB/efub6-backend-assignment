@@ -33,7 +33,10 @@ public enum ErrorCode {
     MESSAGEROOM_NOT_FOUND(404, "쪽지방이 존재하지 않습니다."),
 
     // message
-    NOT_MESSAGEROOM_MEMBER(403, "쪽지방의 참여자가 아닙니다.");
+    NOT_MESSAGEROOM_MEMBER(403, "쪽지방의 참여자가 아닙니다."),
+
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 refresh token 입니다.");
+
 
     private final int status;
     private final String message;
