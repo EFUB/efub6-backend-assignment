@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/community?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
     username: root
-    password: 'admin1234'
+    password: '0000'
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -16,5 +16,33 @@ spring:
       hibernate:
         format_sql: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: b75a44f960e398b81a9eb4f23513f31f
+            client-secret: 3Q2KgSkFxA5rCxHy7TGH7PvyvXZdiqEC
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            client-name: kakao-login
+            scope: # kakao 개인 정보 동의 항목 설정의 ID 값
+              - account_email
+
+        # kakao provider 설정
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id # 유저 정보 조회 시 반환되는 최상위 필드명
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 server:
   port: 8080
+
