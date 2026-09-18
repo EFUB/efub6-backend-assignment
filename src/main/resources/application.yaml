@@ -29,6 +29,7 @@ spring:
             client-name: kakao-login
             scope: # kakao 개인 정보 동의 항목 설정의 ID 값
               - account_email
+              - profile_nickname
 
         # kakao provider 설정
         provider:
