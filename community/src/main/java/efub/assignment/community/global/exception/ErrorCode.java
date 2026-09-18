@@ -35,8 +35,10 @@ public enum ErrorCode {
     MESSAGE_ROOM_NOT_FOUND(404, "쪽지방이 존재하지 않습니다."),
 
     MESSAGE_TO_SELF_NOT_ALLOWED(400, "자기 자신에게 쪽지를 보낼 수 없습니다."),
-    MESSAGE_NOT_FOUND(404, "쪽지가 존재하지 않습니다.");
+    MESSAGE_NOT_FOUND(404, "쪽지가 존재하지 않습니다."),
 
+    //auth
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다.");
 
     private final int status;
     private final String message;

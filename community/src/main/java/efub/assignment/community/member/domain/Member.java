@@ -16,12 +16,16 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long memberId;
 
+    //카카오 사용자 식별 ID
+    @Column(unique=true)
+    private Long kakaoId;
+
     //회원 학번(중복불가)
-    @Column(unique = true, nullable = false, updatable = false)
+    @Column(unique = true, updatable = false)
     private Long studentId;
 
     //회원 학교
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private String university;
 
     //회원 닉네임
@@ -29,22 +33,26 @@ public class Member extends BaseEntity {
     private String nickname;
 
     //회원 이메일
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
     //회원 비밀번호
-    @Column(nullable = false)
     private String password;
+
+    //카카오 프로필 이미지
+    private String profileImage;
 
 
 
     @Builder
-    public Member(Long studentId, String university, String nickname, String email, String password) {
+    public Member(Long kakaoId, Long studentId, String university, String nickname, String email, String password, String profileImage) {
+        this.kakaoId = kakaoId;
         this.studentId = studentId;
         this.university = university;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
+        this.profileImage = profileImage;
     }
 
 
