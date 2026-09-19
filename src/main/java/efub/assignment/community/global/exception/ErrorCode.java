@@ -10,6 +10,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "예상치 못한 서버에러가 발생했습니다."),
     ERROR(400, "요청 처리에 실패했습니다."),
 
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다."),
+
     // account
     ACCOUNT_NOT_FOUND(404, "존재하는 계정이 없습니다."),
 
