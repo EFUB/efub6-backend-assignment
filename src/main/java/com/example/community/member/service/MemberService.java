@@ -1,5 +1,6 @@
 package com.example.community.member.service;
 
+import com.example.community.auth.RefreshTokenStore;
 import com.example.community.global.exception.CustomException;
 import com.example.community.global.exception.ErrorCode;
 import com.example.community.member.domain.Member;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final RefreshTokenStore refreshTokenStore;
 
     // 회원 단건 조회
     @Transactional(readOnly = true)
@@ -59,6 +61,7 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
         member.changeStatus(MemberStatus.UNREGISTER);
+        refreshTokenStore.delete(memberId);
     }
 
     public Member findByMemberId(Long memberId) {
