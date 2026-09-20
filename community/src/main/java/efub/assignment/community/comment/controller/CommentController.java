@@ -5,10 +5,12 @@ import efub.assignment.community.comment.dto.request.UpdateCommentRequestDto;
 import efub.assignment.community.comment.dto.response.CommentListResponseDto;
 import efub.assignment.community.comment.dto.response.CommentResponseDto;
 import efub.assignment.community.comment.service.CommentService;
+import efub.assignment.community.global.security.AuthenticatedMember;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -24,9 +26,14 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponseDto> createComment(
             @PathVariable("postId") Long postId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember,
             @RequestBody @Valid CreateCommentRequestDto requestDto
     ) {
-        CommentResponseDto responseDto = commentService.createComment(postId, requestDto);
+        CommentResponseDto responseDto = commentService.createComment(
+                postId,
+                authenticatedMember.memberId(),
+                requestDto
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -61,10 +68,14 @@ public class CommentController {
     @PatchMapping("/comments/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(
             @PathVariable("commentId") Long commentId,
-            @RequestHeader("Auth-Id") Long memberId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember,
             @RequestBody @Valid UpdateCommentRequestDto requestDto
     ) {
-        CommentResponseDto responseDto = commentService.updateComment(commentId, memberId, requestDto);
+        CommentResponseDto responseDto = commentService.updateComment(
+                commentId,
+                authenticatedMember.memberId(),
+                requestDto
+        );
         return ResponseEntity.ok(responseDto);
     }
 
@@ -72,9 +83,9 @@ public class CommentController {
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Map<String, String>> deleteComment(
             @PathVariable("commentId") Long commentId,
-            @RequestHeader("Auth-Id") Long memberId
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember
     ) {
-        commentService.deleteComment(commentId, memberId);
+        commentService.deleteComment(commentId, authenticatedMember.memberId());
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "성공적으로 삭제되었습니다.");

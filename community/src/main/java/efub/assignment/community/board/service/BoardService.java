@@ -21,8 +21,8 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    public BoardResponseDto createBoard(CreateBoardRequestDto requestDto) {
-        Member member = memberRepository.findById(requestDto.memberId())
+    public BoardResponseDto createBoard(Long memberId, CreateBoardRequestDto requestDto) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Board board = Board.builder()

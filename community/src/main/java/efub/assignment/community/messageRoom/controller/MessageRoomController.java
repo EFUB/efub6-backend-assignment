@@ -1,5 +1,6 @@
 package efub.assignment.community.messageRoom.controller;
 
+import efub.assignment.community.global.security.AuthenticatedMember;
 import efub.assignment.community.messageRoom.dto.request.CreateMessageRoomRequestDto;
 import efub.assignment.community.messageRoom.dto.response.CreateMessageRoomResponseDto;
 import efub.assignment.community.messageRoom.dto.response.MessageRoomCheckResponseDto;
@@ -7,9 +8,9 @@ import efub.assignment.community.messageRoom.dto.response.MessageRoomListRespons
 import efub.assignment.community.messageRoom.service.MessageRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,11 +21,14 @@ public class MessageRoomController {
     // 쪽지방 생성
     @PostMapping("/message-rooms")
     public ResponseEntity<CreateMessageRoomResponseDto> createMessageRoom(
-            @RequestHeader("Auth-Id") Long creatorId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember,
             @RequestBody @Valid CreateMessageRoomRequestDto requestDto
     ) {
         CreateMessageRoomResponseDto responseDto =
-                messageRoomService.createMessageRoom(creatorId, requestDto);
+                messageRoomService.createMessageRoom(
+                        authenticatedMember.memberId(),
+                        requestDto
+                );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -32,11 +36,14 @@ public class MessageRoomController {
     // 쪽지방 목록 조회
     @GetMapping("/members/{memberId}/message-rooms")
     public ResponseEntity<MessageRoomListResponseDto> getMessageRoomByMember(
-            @RequestHeader("Auth-Id") Long authId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember,
             @PathVariable Long memberId
     ) {
         MessageRoomListResponseDto responseDto =
-                messageRoomService.getMessageRoomByMember(authId, memberId);
+                messageRoomService.getMessageRoomByMember(
+                        authenticatedMember.memberId(),
+                        memberId
+                );
 
         return ResponseEntity.ok(responseDto);
     }
@@ -44,12 +51,16 @@ public class MessageRoomController {
     // 쪽지방 여부 조회
     @GetMapping("/message-rooms")
     public ResponseEntity<MessageRoomCheckResponseDto> getMessageRoom(
-            @RequestParam Long senderId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember,
             @RequestParam Long receiverId,
             @RequestParam Long postId
     ) {
         MessageRoomCheckResponseDto responseDto =
-                messageRoomService.getMessageRoom(senderId, receiverId, postId);
+                messageRoomService.getMessageRoom(
+                        authenticatedMember.memberId(),
+                        receiverId,
+                        postId
+                );
 
         return ResponseEntity.ok(responseDto);
     }
@@ -58,9 +69,12 @@ public class MessageRoomController {
     @DeleteMapping("/message-rooms/{messageRoomId}")
     public ResponseEntity<Void> deleteMessageRoom(
             @PathVariable Long messageRoomId,
-            @RequestHeader("Auth-Id") Long memberId
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember
     ) {
-        messageRoomService.deleteMessageRoom(messageRoomId, memberId);
+        messageRoomService.deleteMessageRoom(
+                messageRoomId,
+                authenticatedMember.memberId()
+        );
         return ResponseEntity.noContent().build();
     }
 }
