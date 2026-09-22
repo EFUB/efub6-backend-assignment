@@ -22,15 +22,15 @@ public class Member {
     private String password;
 
     // 회원 닉네임
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     // 회원 대학
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private String university;
 
     // 회원 학번
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private String studentId;
 
     @Builder

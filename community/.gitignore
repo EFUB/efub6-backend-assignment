@@ -18,9 +18,10 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
+*.xml
 *.ipr
 out/
 !**/src/main/**/out/
@@ -37,3 +38,4 @@ out/
 .vscode/
 
 src/main/resources/application.yml
+.yaml
