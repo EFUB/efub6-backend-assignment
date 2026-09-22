@@ -4,18 +4,16 @@ import efub.assignment.community.member.domain.Member;
 
 public record MemberResponseDto(
         Long memberId,
-        String studentId,
-        String university,
         String nickname,
-        String email
+        String email,
+        String profileImage
 ) {
     public static MemberResponseDto from(Member member) {
         return new MemberResponseDto(
                 member.getMemberId(),
-                member.getStudentId(),
-                member.getUniversity(),
                 member.getNickname(),
-                member.getEmail()
+                member.getEmail(),
+                member.getProfileImage()
         );
     }
 }

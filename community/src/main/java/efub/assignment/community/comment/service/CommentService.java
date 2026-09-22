@@ -31,8 +31,12 @@ public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
 
     // 댓글 생성
-    public CommentResponseDto createComment(Long postId, CreateCommentRequestDto requestDto) {
-        Member writer = memberService.findByMemberId(requestDto.memberId());
+    public CommentResponseDto createComment(
+            Long postId,
+            Long memberId,
+            CreateCommentRequestDto requestDto
+    ) {
+        Member writer = memberService.findByMemberId(memberId);
         Post post = postService.findByPostId(postId);
 
         Comment comment = requestDto.toEntity(writer, post);

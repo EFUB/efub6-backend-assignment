@@ -11,6 +11,11 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "예상치 못한 서버 에러가 발생했습니다."),
     INVALID_INPUT(400, "잘못된 요청입니다."),
 
+    // AUTH
+    UNAUTHORIZED(401, "인증이 필요합니다."),
+    ACCESS_DENIED(403, "접근 권한이 없습니다."),
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 Refresh token입니다."),
+
     // MEMBER
     MEMBER_NOT_FOUND(404, "해당 id의 멤버가 존재하지 않습니다."),
     DUPLICATE_EMAIL(400, "이미 사용 중인 이메일입니다."),

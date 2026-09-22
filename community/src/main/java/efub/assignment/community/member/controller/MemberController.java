@@ -1,6 +1,9 @@
 package efub.assignment.community.member.controller;
 
 
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
+import efub.assignment.community.global.security.AuthenticatedMember;
 import efub.assignment.community.member.dto.request.CreateMemberRequestDto;
 import efub.assignment.community.member.dto.request.UpdateMemberNicknameRequestDto;
 import efub.assignment.community.member.dto.response.CreateMemberResponseDto;
@@ -10,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -37,14 +41,23 @@ public class MemberController {
 
     // 멤버 닉네임 수정
     @PatchMapping("/profile/{memberId}")
-    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable("memberId") Long memberId, @RequestBody @Valid UpdateMemberNicknameRequestDto requestDto){
+    public ResponseEntity<MemberResponseDto> updateMember(
+            @PathVariable("memberId") Long memberId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember,
+            @RequestBody @Valid UpdateMemberNicknameRequestDto requestDto
+    ) {
+        authorizeSelf(memberId, authenticatedMember);
         MemberResponseDto responseDto = memberService.updateMember(memberId,requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     // 멤버 논리적 삭제(탈퇴)
     @PatchMapping("/{memberId}")
-    public ResponseEntity<Map<String, String>> deleteMember(@PathVariable("memberId") Long memberId){
+    public ResponseEntity<Map<String, String>> deleteMember(
+            @PathVariable("memberId") Long memberId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember
+    ) {
+        authorizeSelf(memberId, authenticatedMember);
         memberService.deleteMember(memberId);
         Map<String,String> response = new HashMap<>();
         response.put("message","성공적으로 탈퇴되었습니다.");
@@ -53,11 +66,21 @@ public class MemberController {
 
     // 멤버 물리적 삭제
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<Map<String,String>> physicalDeleteMember(@PathVariable("memberId") Long memberId){
+    public ResponseEntity<Map<String,String>> physicalDeleteMember(
+            @PathVariable("memberId") Long memberId,
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember
+    ) {
+        authorizeSelf(memberId, authenticatedMember);
         memberService.physicalDeleteMember(memberId);
         Map<String,String> response = new HashMap<>();
         response.put("message","성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(response);
+    }
+
+    private void authorizeSelf(Long memberId, AuthenticatedMember authenticatedMember) {
+        if (!authenticatedMember.memberId().equals(memberId)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
     }
 
 }

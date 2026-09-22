@@ -1,9 +1,11 @@
 package efub.assignment.community.notification.controller;
 
+import efub.assignment.community.global.security.AuthenticatedMember;
 import efub.assignment.community.notification.dto.response.NotificationListResponseDto;
 import efub.assignment.community.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,10 +16,10 @@ public class NotificationController {
 
     @GetMapping("/notifications")
     public ResponseEntity<NotificationListResponseDto> getNotifications(
-            @RequestHeader("Auth-Id") Long memberId
+            @AuthenticationPrincipal AuthenticatedMember authenticatedMember
     ) {
         NotificationListResponseDto responseDto =
-                notificationService.getNotifications(memberId);
+                notificationService.getNotifications(authenticatedMember.memberId());
 
         return ResponseEntity.ok(responseDto);
     }
