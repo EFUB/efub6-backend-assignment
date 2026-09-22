@@ -12,6 +12,12 @@ public enum ErrorCode {
 
     // member
     MEMBER_NOT_FOUND(404, "존재하는 회원이 없습니다."),
+    MEMBER_UNREGISTERED(403, "탈퇴한 회원입니다."),
+    INVALID_TOKEN(401, "유효하지 않거나 만료된 토큰입니다."),
+    REFRESH_TOKEN_MISMATCH(401, "저장된 Refresh Token과 일치하지 않습니다."),
+    INVALID_KAKAO_USER(401, "카카오 사용자 ID 또는 이메일을 확인할 수 없습니다."),
+    OAUTH_LOGIN_FAILED(401, "카카오 로그인에 실패했습니다."),
+    TOKEN_STORE_UNAVAILABLE(503, "토큰 저장소를 사용할 수 없습니다."),
 
     // board
     BOARD_NOT_FOUND(404, "해당 id의 게시판이 존재하지 않습니다."),
