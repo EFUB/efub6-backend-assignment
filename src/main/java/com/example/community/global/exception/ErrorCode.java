@@ -31,7 +31,10 @@ public enum ErrorCode {
     MESSAGE_ROOM_NOT_FOUND(404, "해당 쪽지방을 찾을 수 없습니다."),
     MESSAGE_ROOM_ALREADY_EXISTS(409, "이미 존재하는 쪽지방입니다."),
     MESSAGE_ROOM_SELF_SEND(400, "자기 자신에게 쪽지를 보낼 수 없습니다."),
-    MESSAGE_ROOM_ACCOUNT_MISMATCH(403, "쪽지방 참여자가 아닙니다.");
+    MESSAGE_ROOM_ACCOUNT_MISMATCH(403, "쪽지방 참여자가 아닙니다."),
+
+    //auth
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다.");
 
     private final int status;
     private final String message;

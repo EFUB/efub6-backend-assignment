@@ -24,10 +24,10 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String nickname;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String university;
 
-    @Column(nullable = false, length = 20)
+    @Column( length = 20)
     private String studentId;
 
     @Enumerated(EnumType.STRING)
