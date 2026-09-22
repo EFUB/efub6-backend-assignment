@@ -32,7 +32,7 @@ public class Member {
     @Column (nullable = false)
     private String university;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String studentId;
 
     @Column (nullable = false)

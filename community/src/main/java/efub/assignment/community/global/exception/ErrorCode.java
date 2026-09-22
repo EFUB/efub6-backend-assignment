@@ -28,7 +28,8 @@ public enum ErrorCode {
     COMMENT_LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다."),
     MESSAGEROOM_ALREADY_EXISTS(400, "쪽지방이 이미 존재합니다."),
     MESSAGEROOM_NOT_FOUND(404, "쪽지방이 존재하지 않습니다."),
-    MESSAGEROOM_MEMBER_MISMATCH(401, "쪽지방의 주인이 아닙니다.");
+    MESSAGEROOM_MEMBER_MISMATCH(401, "쪽지방의 주인이 아닙니다."),
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다.");;
 
     private final int status;
     private final String message;
