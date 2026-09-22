@@ -35,11 +35,11 @@ public class Member extends BaseEntity {
     private String nickname;
 
     // 멤버 학교
-    @Column(nullable = false)
+    @Column
     private String school;
 
     // 멤버 학번
-    @Column(nullable = false)
+    @Column
     private String studentId;
 
     // 멤버 상태

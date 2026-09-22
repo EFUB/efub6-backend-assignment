@@ -1,5 +1,7 @@
 package efub.assignment.community.member.service;
 
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.domain.MemberStatus;
 import efub.assignment.community.member.dto.CreateMemberRequestDto;
@@ -62,5 +64,10 @@ public class MemberService {
     public Member findByNickname(String nickname) {
         return membersRepository.findByNickname(nickname)
                 .orElseThrow(() -> new IllegalArgumentException("해당 닉네임을 가진 회원을 찾을 수 없습니다. 닉네임: " + nickname));
+    }
+
+    public Member findByEmail(String email) {
+        return membersRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
     }
 }
