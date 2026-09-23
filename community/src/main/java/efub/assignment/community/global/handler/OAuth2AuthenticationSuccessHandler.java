@@ -5,7 +5,6 @@ import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.global.jwt.TokenProvider;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
