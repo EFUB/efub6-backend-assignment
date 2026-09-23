@@ -30,15 +30,28 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
-    @Transactional
-    public Long createPost(PostCreateRequestDto request) {
-        Board board = boardService.findByBoardId(request.getBoardId());
-        Member writer = memberService.findByMemberId(request.getMemberId());
+    //TDD 과제 주석처리
+//    @Transactional
+//    public Long createPost(PostCreateRequestDto request) {
+//        Board board = boardService.findByBoardId(request.getBoardId());
+//        Member writer = memberService.findByMemberId(request.getMemberId());
+//
+//        Post newPost = request.toEntity(board, writer);
+//        postRepository.save(newPost);
+//
+//        return newPost.getPostId();
+//    }
 
-        Post newPost = request.toEntity(board, writer);
+    //TODO: [GREEN] TDD
+    @Transactional
+    public PostResponseDto createPost(PostCreateRequestDto request) {
+        Board board = boardService.findByBoardId(request.getBoardId());
+        Member author = memberService.findByMemberId(request.getMemberId());
+
+        Post newPost = request.toEntity(board, author);
         postRepository.save(newPost);
 
-        return newPost.getPostId();
+        return PostResponseDto.from(newPost);
     }
 
     @Transactional

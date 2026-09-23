@@ -19,13 +19,19 @@ import java.net.URI;
 public class PostController {
     private final PostService postService;
 
+    //TDD 과제 진행 주석 처리
+//    @PostMapping
+//    public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequestDto request) {
+//        Long id = postService.createPost(request);
+//
+//        return ResponseEntity.created(URI.create("/posts/"+id)).build();
+//    }
+
     @PostMapping
-    public ResponseEntity<Void> createPost(@Valid @RequestBody PostCreateRequestDto request) {
-        Long id = postService.createPost(request);
-
-        return ResponseEntity.created(URI.create("/posts/"+id)).build();
+    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostCreateRequestDto request) {
+        PostResponseDto response = postService.createPost(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
     @GetMapping
     public ResponseEntity<PostListResponseDto> getAllPosts() {
         PostListResponseDto response = postService.getAllPosts();
