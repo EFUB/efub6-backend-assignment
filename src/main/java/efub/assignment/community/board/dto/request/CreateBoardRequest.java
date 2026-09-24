@@ -6,10 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateBoardRequest {
 
@@ -29,5 +31,12 @@ public class CreateBoardRequest {
                 .description(description)
                 .notification(notification)
                 .build();
+    }
+
+    @Builder
+    public CreateBoardRequest(String name, String description, String notification) {
+        this.name = name;
+        this.description = description;
+        this.notification = notification;
     }
 }
