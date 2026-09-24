@@ -1,9 +1,10 @@
 package efub.assignment.community.global.handler;
 
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.global.jwt.TokenProvider;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         // nickname을 통해 데이터베이스에서 User 엔티티 조회
         Member member = memberRepository.findByNickname(nickname)
-                .orElseThrow(() -> new EntityNotFoundException("해당 nickname을 가진 Member가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND_WITH_NICKNAME));
 
         // AccessToken, RefreshToken 발급
         String accessToken = tokenProvider.createAccessToken(member);
