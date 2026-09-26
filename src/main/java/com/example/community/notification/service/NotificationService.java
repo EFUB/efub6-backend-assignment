@@ -57,5 +57,9 @@ public class NotificationService {
         return new NotificationListResponse(items, (long) items.size());
     }
 
-
+    // 읽지 않은 알림 일괄 읽음 처리
+    public void readAllNotifications(Long memberId) {
+        memberService.findByMemberId(memberId);
+        notificationRepository.markAllAsRead(memberId);
+    }
 }
