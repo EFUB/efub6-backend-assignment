@@ -26,7 +26,7 @@ public class NotificationService {
         Notification notification = Notification.builder()
                 .receiver(receiver)
                 .type(NotificationType.COMMENT)
-                .content("새로운 댓글이 달렸어요: " + truncate(commentContent))
+                .content("새로운 댓글이 달렸어요: " + commentContent)
                 .boardName(boardName)
                 .build();
         notificationRepository.save(notification);
@@ -57,9 +57,5 @@ public class NotificationService {
         return new NotificationListResponse(items, (long) items.size());
     }
 
-    // 댓글 내용이 20자 초과 시 말줄임표 처리
-    private String truncate(String content) {
-        if (content.length() <= 20) return content;
-        return content.substring(0, 20) + "...";
-    }
+
 }
