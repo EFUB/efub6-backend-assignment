@@ -1,5 +1,7 @@
 package com.example.community.notification.service;
 
+import com.example.community.global.exception.CustomException;
+import com.example.community.global.exception.ErrorCode;
 import com.example.community.member.domain.Member;
 import com.example.community.member.service.MemberService;
 import com.example.community.notification.domain.Notification;
@@ -16,8 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationServiceTest {
@@ -87,6 +89,33 @@ public class NotificationServiceTest {
         // then
         assertThat(response.notifications()).isEmpty();
         assertThat(response.totalNotifications()).isZero();
+    }
+
+
+    @Test
+    @DisplayName("회원의 모든 읽지 않은 알림을 일괄 읽음 처리한다")
+    void readAllNotifications_MarksAllAsRead() {
+        // given
+        when(memberService.findByMemberId(memberId)).thenReturn(member);
+        when(notificationRepository.markAllAsRead(memberId)).thenReturn(2);
+
+        // when
+        notificationService.readAllNotifications(memberId);
+
+        // then
+        verify(notificationRepository, times(1)).markAllAsRead(memberId);
+    }
+
+    @Test
+    @DisplayName("읽지 않은 알림이 없으면 일괄 읽음 요청을 정상 종료한다")
+    void readAllNotifications_DoesNothing_WhenNoUnreadNotifications() {
+        // given
+        when(memberService.findByMemberId(memberId)).thenReturn(member);
+        when(notificationRepository.markAllAsRead(memberId)).thenReturn(0);
+
+        // when & then
+        assertThatCode(() -> notificationService.readAllNotifications(memberId))
+                .doesNotThrowAnyException();
     }
 
 }
