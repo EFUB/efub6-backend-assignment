@@ -33,11 +33,26 @@ public class Notification extends BaseEntity {
     @Column(length = 50)
     private String boardName;
 
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead = false;
+
     @Builder
     public Notification(Member receiver, NotificationType type, String content, String boardName) {
         this.receiver = receiver;
         this.type = type;
-        this.content = content;
+        this.content = truncate(content);
         this.boardName = boardName;
     }
+
+    public void read() {
+        this.isRead = true;
+    }
+
+    private String truncate(String text) {
+        if (text == null || text.length() <= 30) {
+            return text;
+        }
+        return text.substring(0, 30) + "...";
+    }
+
 }
