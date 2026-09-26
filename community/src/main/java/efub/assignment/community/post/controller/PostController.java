@@ -42,6 +42,15 @@ public class PostController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @GetMapping("/boards/{boardId}/posts/search")
+    public ResponseEntity<PostListResponseDto> searchPosts(
+            @PathVariable("boardId") Long boardId,
+            @RequestParam("keyword") String keyword
+    ) {
+        PostListResponseDto responseDto = postService.searchPosts(boardId, keyword);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @GetMapping("/posts/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable("postId") Long postId) {
         PostResponseDto responseDto = postService.getPost(postId);
