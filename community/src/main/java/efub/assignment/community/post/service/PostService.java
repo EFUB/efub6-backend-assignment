@@ -59,18 +59,31 @@ public class PostService {
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-        List<PostSummaryDto> posts = postRepository
-                .findAllByBoard_BoardIdOrderByCreatedAtDesc(boardId)
-                .stream()
-                .map(post -> PostSummaryDto.from(
-                        post,
-                        postLikeRepository.countByPost(post)
-                ))
-                .toList();
+        List<PostSummaryDto> posts = toPostSummaries(
+                postRepository.findAllByBoard_BoardIdOrderByCreatedAtDesc(boardId)
+        );
 
         Long totalPosts = postRepository.countByBoard_BoardId(boardId);
 
         return new PostListResponseDto(posts, totalPosts);
+    }
+
+    // 게시글 제목/내용 검색
+    @Transactional(readOnly = true)
+    public PostListResponseDto searchPosts(Long boardId, String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        String normalizedKeyword = keyword.trim();
+        List<PostSummaryDto> posts = toPostSummaries(
+                postRepository.searchByBoardIdAndKeyword(boardId, normalizedKeyword)
+        );
+
+        return new PostListResponseDto(posts, (long) posts.size());
     }
 
     // 게시글 상세 조회
@@ -139,6 +152,15 @@ public class PostService {
     public Post findByPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    private List<PostSummaryDto> toPostSummaries(List<Post> posts) {
+        return posts.stream()
+                .map(post -> PostSummaryDto.from(
+                        post,
+                        postLikeRepository.countByPost(post)
+                ))
+                .toList();
     }
 
     private void authorizePostWriter(Post post, Member member) {
