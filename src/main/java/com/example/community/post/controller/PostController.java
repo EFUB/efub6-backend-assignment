@@ -17,6 +17,7 @@ public class PostController {
 
     private final PostService postService;
 
+    // TDD 과제 주석 처리
     // 글 생성
     @PostMapping("/boards/{boardId}/posts")
     public ResponseEntity<PostResponse> createPost(@PathVariable Long boardId,

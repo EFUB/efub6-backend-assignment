@@ -22,6 +22,7 @@ public enum ErrorCode {
     POST_ACCOUNT_MISMATCH(403, "게시글 생성자가 아닙니다."),
     POST_LIKE_ALREADY_EXISTS(409, "이미 좋아요를 누른 게시글입니다."),
     POST_LIKE_NOT_FOUND(404, "좋아요가 존재하지 않습니다."),
+    POST_INVALID_TITLE(404, "제목은 공백일 수 없습니다."),
 
     // comment
     COMMENT_NOT_FOUND(404, "해당 id의 댓글이 존재하지 않습니다."),
