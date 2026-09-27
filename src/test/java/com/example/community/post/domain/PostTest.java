@@ -1,5 +1,6 @@
 package com.example.community.post.domain;
 
+import com.example.community.global.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,8 +61,7 @@ class PostTest {
     @ValueSource(strings = {"", " ", "\t"})
     @DisplayName("제목이 공백(빈 문자열, 스페이스만)이면 수정 거부")
     void change_post_invalid_title(String invalidTitle) {
-
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> post.changePost(invalidTitle, null));
+        assertThrows(CustomException.class, () -> post.changePost(invalidTitle, null));
     }
 }
