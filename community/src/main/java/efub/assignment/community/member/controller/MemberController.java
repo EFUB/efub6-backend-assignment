@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,8 +37,9 @@ public class MemberController {
     public ResponseEntity<CreateMemberResponseDto> createMember(@RequestBody CreateMemberRequestDto requestDto) {
         //@RequestBody: MessageConverter가 클라이언트의 바디(JSON) -> dto로 변경해줌
        CreateMemberResponseDto responseDto = memberService.createMember(requestDto);
+       URI location = URI.create("/members/"+responseDto.getMemberId());
 
-       return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+       return ResponseEntity.created(location).body(responseDto);
     }
 
     // [프로필 수정]: /members/{memberId}
