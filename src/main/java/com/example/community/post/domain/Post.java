@@ -2,6 +2,8 @@ package com.example.community.post.domain;
 
 import com.example.community.board.domain.Board;
 import com.example.community.global.domain.BaseEntity;
+import com.example.community.global.exception.CustomException;
+import com.example.community.global.exception.ErrorCode;
 import com.example.community.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -44,10 +46,17 @@ public class Post extends BaseEntity {
         this.content = content;
     }
 
+    // TDD 과제 주석 처리
     public void changePost(String title, String content) {
-        if (title != null)      this.title = title;
-        if (content != null)    this.content = content;
-
+        if (title != null) {
+            if (title.isBlank()) {
+                throw new CustomException(ErrorCode.POST_INVALID_TITLE);
+            }
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
     }
 
 }
