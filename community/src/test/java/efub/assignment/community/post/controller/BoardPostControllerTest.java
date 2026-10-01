@@ -2,25 +2,26 @@ package efub.assignment.community.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import efub.assignment.community.board.domain.Board;
+import efub.assignment.community.board.repository.BoardRepository;
 import efub.assignment.community.member.domain.Member;
+import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.dto.request.PostCreateRequest;
-import efub.assignment.community.post.dto.response.PostListResponse;
-import efub.assignment.community.post.dto.response.PostResponse;
-import efub.assignment.community.post.dto.summary.PostSummary;
-import efub.assignment.community.post.service.PostService;
+import efub.assignment.community.post.repository.PostRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 
@@ -28,164 +29,137 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(BoardPostController.class)
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@MockitoBean(types = JpaMetamodelMappingContext.class)
+@ActiveProfiles("test")
+@Transactional
 public class BoardPostControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockitoBean
-    private PostService postService;
+    @Autowired MockMvc mockMvc;
+    @Autowired ObjectMapper objectMapper;
+    @Autowired EntityManager em;
+    @Autowired MemberRepository memberRepository;
+    @Autowired BoardRepository boardRepository;
+    @Autowired PostRepository postRepository;
 
     private Member testMember;
     private Board testBoard;
-    private Post testPost;
 
     @BeforeEach
     void setUp() {
-        testMember = Member.builder()
+        testMember = memberRepository.save(Member.builder()
                 .email("test@ewha.ac.kr")
                 .password("1234")
                 .nickname("김남우")
                 .university("이화여자대학교")
                 .studentId("1111111")
-                .build();
+                .build());
 
-        testBoard = Board.builder()
+        testBoard = boardRepository.save(Board.builder()
                 .owner(testMember)
                 .boardname("게시판1")
                 .description("안녕하세요!")
                 .notice("존댓말 사용 부탁드립니다~")
-                .build();
+                .build());
+    }
 
-        testPost = Post.builder()
-                .board(testBoard)
-                .writer(testMember)
+    @Test
+    @DisplayName("POST /boards/{boardId}/posts -> 201 & 응답 필드 검증 & H2 저장")
+    void create_post_success() throws Exception {
+        // given
+        PostCreateRequest request = PostCreateRequest.builder()
                 .anonymous(true)
                 .content("글 내용")
                 .build();
-    }
 
-    // 게시글 생성 API 테스트
-    @Test
-    void create_post_success() throws Exception {
-        // given
-        Long boardId = 1L;
-        Long memberId = 1L;
-        boolean anonymous = true;
-        String content = "글 내용";
-
-        PostCreateRequest request = PostCreateRequest.builder()
-                .anonymous(anonymous)
-                .content(content)
-                .build();
-
-        given(postService.createPost(eq(boardId), eq(memberId), any(PostCreateRequest.class))).willReturn(PostResponse.from(testPost));
-
-        // when & then
-        mockMvc.perform(post("/boards/{boardId}/posts", 1L)
-                        .header("Auth-Id", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        // when
+        mockMvc.perform(post("/boards/{boardId}/posts", testBoard.getId())
+                        .header("Auth-Id", testMember.getMemberId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.content").value(content));
-        verify(postService).createPost(eq(boardId), eq(memberId), any(PostCreateRequest.class));
+                .andExpect(jsonPath("$.content").value("글 내용"));
+
+        // then
+        em.flush();
+        em.clear();
+
+        List<Post> posts = postRepository.findAll();
+        assertThat(posts).hasSize(1);
+
+        Post savedPost = posts.get(0);
+        assertThat(savedPost.getContent()).isEqualTo("글 내용");
+        assertThat(savedPost.isAnonymous()).isTrue();
+        assertThat(savedPost.getWriter().getMemberId()).isEqualTo(testMember.getMemberId());
+        assertThat(savedPost.getBoard().getId()).isEqualTo(testBoard.getId());
     }
 
-    // Auth-Id 헤더가 없을 시 예외 처리
     @Test
+    @DisplayName("POST /boards/{boardId}/posts Auth-Id 헤더 없음 -> 400 & 저장 x")
     void throw_exception_when_header_not_exist() throws Exception {
         // given
-        boolean anonymous = true;
-        String content = "글 내용";
-
         PostCreateRequest request = PostCreateRequest.builder()
-                .anonymous(anonymous)
-                .content(content)
+                .anonymous(true)
+                .content("글 내용")
                 .build();
 
         // when & then
-       mockMvc.perform(post("/boards/{boardId}/posts", 1L)
-               .contentType(MediaType.APPLICATION_JSON)
-               .content(objectMapper.writeValueAsString(request)))
-               .andExpect(status().isBadRequest())
-               .andExpect(result -> assertThat(result.getResolvedException())
-                       .isInstanceOf(MissingRequestHeaderException.class));
+        mockMvc.perform(post("/boards/{boardId}/posts", testBoard.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertThat(result.getResolvedException())
+                        .isInstanceOf(MissingRequestHeaderException.class));
 
-        verifyNoInteractions(postService);
+        assertThat(postRepository.count()).isZero();
     }
 
-    // content가 null, 빈 칸, 공백, max 초과일 경우 예외 처리
     @ParameterizedTest
     @MethodSource("invalidContents")
+    @DisplayName("POST /boards/{boardId}/posts 잘못된 content -> 400 & 저장 x")
     void throw_exception_when_content_not_valid(String content) throws Exception {
         // given
-        boolean anonymous = true;
-
         PostCreateRequest request = PostCreateRequest.builder()
-                .anonymous(anonymous)
+                .anonymous(true)
                 .content(content)
                 .build();
 
         // when & then
-        mockMvc.perform(post("/boards/{boardId}/posts", 1L)
-                        .header("Auth-Id", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/boards/{boardId}/posts", testBoard.getId())
+                        .header("Auth-Id", testMember.getMemberId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(MethodArgumentNotValidException.class));
 
-        verifyNoInteractions(postService);
+        assertThat(postRepository.count()).isZero();
     }
 
     @Test
+    @DisplayName("GET /boards/{boardId}/posts -> 200 & 게시글 목록")
     void get_all_posts_success() throws Exception {
         // given
-        Post post1 = Post.builder()
-                .board(testBoard)
-                .writer(testMember)
-                .anonymous(true)
-                .content("글 내용1")
-                .build();
-        Post post2 = Post.builder()
-                .board(testBoard)
-                .writer(testMember)
-                .anonymous(true)
-                .content("글 내용2")
-                .build();
-        PostSummary postSummary1 = PostSummary.from(post1);
-        PostSummary postSummary2 = PostSummary.from(post2);
-
-        given(postService.getAllPosts(1L))
-                .willReturn(new PostListResponse(List.of(postSummary1, postSummary2), 2L));
+        postRepository.save(Post.builder()
+                .board(testBoard).writer(testMember).anonymous(true).content("글 내용1").build());
+        postRepository.save(Post.builder()
+                .board(testBoard).writer(testMember).anonymous(true).content("글 내용2").build());
 
         // when & then
-        mockMvc.perform(get("/boards/{boardId}/posts", 1L))
+        mockMvc.perform(get("/boards/{boardId}/posts", testBoard.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.posts.length()").value(2))
-                .andExpect(jsonPath("$.posts[0].content").value("글 내용1"))
-                .andExpect(jsonPath("$.posts[1].content").value("글 내용2"));
-
-        verify(postService).getAllPosts(1L);
+                .andExpect(jsonPath("$.posts[*].content",
+                        containsInAnyOrder("글 내용1", "글 내용2")));
     }
 
-    // PostCreateRequest.content 테스트 항목
     static Stream<Named<String>> invalidContents() {
         return Stream.of(
                 Named.of("null", null),

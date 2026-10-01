@@ -5,11 +5,12 @@ import efub.assignment.community.member.dto.request.ProfileUpdateRequestDto;
 import efub.assignment.community.member.dto.response.GetMemberResponseDto;
 import efub.assignment.community.member.dto.response.MemberResponseDto;
 import efub.assignment.community.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,14 +31,14 @@ public class MemberController {
     // 회원 가입: POST /members
     @PostMapping
     public ResponseEntity<MemberResponseDto> createMember(@RequestBody CreateMemberRequestDto requestDto) {
-        MemberResponseDto responseDto = memberService.createMember(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        Long id = memberService.createMember(requestDto);
+        return ResponseEntity.created(URI.create("/members/" + id)).build();
     }
 
     // 회원 프로필 수정: PATCH /members/profile/{memberId}
     @PatchMapping("/profile/{memberId}")
     public ResponseEntity<MemberResponseDto> updateProfile(@PathVariable("memberId") Long memberId,
-                                                           @RequestBody ProfileUpdateRequestDto requestDto) {
+                                                           @Valid @RequestBody ProfileUpdateRequestDto requestDto) {
         MemberResponseDto responseDto = memberService.updateProfile(memberId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
