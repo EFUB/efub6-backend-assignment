@@ -51,7 +51,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private Member createMember(OAuth2UserInfo oAuth2UserInfo) {
         Member member = Member.builder()
-                .email(null)
                 .password("")
                 .nickname(oAuth2UserInfo.getNickname())
                 .build();

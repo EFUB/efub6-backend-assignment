@@ -6,8 +6,8 @@ import efub.assignment.community.post.dto.response.PostResponse;
 import efub.assignment.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +23,7 @@ public class BoardPostController {
                                                    @RequestHeader("Auth-Id") Long memberId,
                                                    @Valid @RequestBody PostCreateRequest request) {
         PostResponse response = postService.createPost(boardId, memberId, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 게시물 목록 조회

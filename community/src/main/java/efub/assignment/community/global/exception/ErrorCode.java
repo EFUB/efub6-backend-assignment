@@ -12,6 +12,7 @@ public enum ErrorCode {
 
     // member
     ACCOUNT_NOT_FOUND(404, "존재하지 않는 계정입니다."),
+    ACCOUNT_NOT_FOUND_WITH_NICKNAME(404, "해당 nickname을 가진 Member가 존재하지 않습니다."),
 
     // post
     POST_NOT_FOUND(404, "존재하지 않는 게시물입니다."),

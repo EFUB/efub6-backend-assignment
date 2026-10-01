@@ -45,11 +45,15 @@ public class PostService {
     // 게시글 목록 조회
     @Transactional(readOnly = true)
     public PostListResponse getAllPosts(Long boardId) {
-        List<PostSummary> postSummaries = postRepository.findAllByOrderByCreatedAtDesc()
+        // Green: 게시판이 존재하지 않을 경우 CustomException 발생
+        boardService.findByBoardId(boardId);
+
+        // 게시판 별 게시글 조회하도록 수정
+        List<PostSummary> postSummaries = postRepository.findAllByBoardIdOrderByCreatedAtDesc(boardId)
                 .stream()
                 .map(PostSummary::from)
                 .toList();
-        return new PostListResponse(postSummaries, postRepository.count());
+        return new PostListResponse(postSummaries, (long) postSummaries.size());
     }
 
     // 게시글 상세 조회
