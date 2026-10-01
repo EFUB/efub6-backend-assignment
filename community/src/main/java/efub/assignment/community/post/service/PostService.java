@@ -63,6 +63,7 @@ public class PostService {
         return PostResponse.from(post);
     }
 
+    // TDD 과제용 주석 처리
     @Transactional
     public PostResponse updatePost(Long postId, Long memberId, @Valid PostUpdateRequest request) {
         Post post = findByPostId(postId);
