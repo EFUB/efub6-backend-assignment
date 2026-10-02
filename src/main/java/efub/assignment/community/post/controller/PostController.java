@@ -25,7 +25,7 @@ public class PostController {
                                            @RequestHeader("Auth-Id") Long memberId,
                                            @Valid @RequestBody CreatePostRequest request) {
         Long postId = postService.createPost(boardId, memberId, request);
-        return ResponseEntity.created(URI.create("/boards/"+boardId+"/posts/"+postId)).build();
+        return ResponseEntity.created(URI.create("/boards/" + boardId + "/posts/" + postId)).build();
     }
 
     // 게시글 전체 조회
@@ -60,7 +60,7 @@ public class PostController {
     // 게시글 좋아요 생성
     @PostMapping("/posts/{postId}/like")
     public ResponseEntity<PostResponse> likePost(@PathVariable("postId") Long postId,
-                                           @RequestHeader("Auth-Id") Long memberId) {
+                                                 @RequestHeader("Auth-Id") Long memberId) {
         PostResponse response = postService.likePost(postId, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -68,7 +68,7 @@ public class PostController {
     // 게시글 좋아요 삭제
     @DeleteMapping("/posts/{postId}/like")
     public ResponseEntity<Void> unlikePost(@PathVariable("postId") Long postId,
-                                             @RequestHeader("Auth-Id") Long memberId) {
+                                           @RequestHeader("Auth-Id") Long memberId) {
         postService.unlikePost(postId, memberId);
         return ResponseEntity.noContent().build();
     }
