@@ -47,6 +47,14 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<PostListResponseDto> search(@RequestParam(value = "keyword", required = false) String keyword,
+                                                       @RequestParam(value = "ownerName", required = false) String ownerName) {
+        PostListResponseDto response = postService.search(keyword, ownerName);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updatePostContent (@PathVariable("id") Long postId,
                                                    @RequestHeader("Auth-id") Long memberId,
