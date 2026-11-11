@@ -30,7 +30,8 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostCreateRequestDto request) {
         PostResponseDto response = postService.createPost(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        URI location = URI.create("/posts/" + response.postId());
+        return ResponseEntity.created(location).body(response);
     }
     @GetMapping
     public ResponseEntity<PostListResponseDto> getAllPosts() {
@@ -42,6 +43,14 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPost (@PathVariable("id") Long postId) {
         PostResponseDto response = postService.getPost(postId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PostListResponseDto> search(@RequestParam(value = "keyword", required = false) String keyword,
+                                                       @RequestParam(value = "writerNickName", required = false) String writerNickName) {
+        PostListResponseDto response = postService.search(keyword, writerNickName);
 
         return ResponseEntity.ok(response);
     }

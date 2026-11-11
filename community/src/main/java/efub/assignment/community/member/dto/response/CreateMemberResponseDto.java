@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder @Getter
 @AllArgsConstructor
 public class CreateMemberResponseDto {
+    private Long memberId;
     private String nickname;
     private String email;
     private String university;
@@ -15,6 +16,7 @@ public class CreateMemberResponseDto {
 
     public static CreateMemberResponseDto from(Member member) {
         return CreateMemberResponseDto.builder()
+                .memberId(member.getMemberId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .university(member.getUniversity())

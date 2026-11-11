@@ -63,7 +63,7 @@ public class PostService {
         return PostResponseDto.from(post);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PostListResponseDto getAllPosts() {
         List<PostSummary> postSummaries = postRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
@@ -71,6 +71,16 @@ public class PostService {
                 .toList();
 
         return new PostListResponseDto(postSummaries, postRepository.count());
+    }
+
+    @Transactional(readOnly = true)
+    public PostListResponseDto search(String keyword, String ownerName) {
+        List<PostSummary> postSummaries = postRepository.search(keyword, ownerName)
+                .stream()
+                .map(PostSummary::from)
+                .toList();
+
+        return new PostListResponseDto(postSummaries, (long) postSummaries.size());
     }
 
     @Transactional
@@ -128,7 +138,6 @@ public class PostService {
             throw new CustomException(ErrorCode.POST_ACCOUNT_MISMATCH);
         }
     }
-
 }
 
 

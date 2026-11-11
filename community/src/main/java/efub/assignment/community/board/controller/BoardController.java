@@ -2,6 +2,7 @@ package efub.assignment.community.board.controller;
 
 import efub.assignment.community.board.dto.request.BoardCreateRequest;
 import efub.assignment.community.board.dto.request.BoardUpdateRequest;
+import efub.assignment.community.board.dto.response.BoardListResponseDto;
 import efub.assignment.community.board.dto.response.BoardResponseDto;
 import efub.assignment.community.board.service.BoardService;
 import jakarta.validation.Valid;
@@ -27,6 +28,14 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity<BoardResponseDto> getBoard(@PathVariable("id")Long boardId) {
         BoardResponseDto response = boardService.getBoard(boardId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<BoardListResponseDto> search(@RequestParam(value = "keyword", required = false) String keyword,
+                                                       @RequestParam(value = "ownerNickName", required = false) String ownerNickName) {
+        BoardListResponseDto response = boardService.search(keyword, ownerNickName);
 
         return ResponseEntity.ok(response);
     }

@@ -3,6 +3,7 @@ package efub.assignment.community.board.service;
 import efub.assignment.community.board.domain.Board;
 import efub.assignment.community.board.dto.request.BoardCreateRequest;
 import efub.assignment.community.board.dto.request.BoardUpdateRequest;
+import efub.assignment.community.board.dto.response.BoardListResponseDto;
 import efub.assignment.community.board.dto.response.BoardResponseDto;
 import efub.assignment.community.board.repositoriy.BoardRepository;
 import efub.assignment.community.global.exception.CustomException;
@@ -36,6 +37,12 @@ public class BoardService {
         Board board = findByBoardId(boardId);
 
         return BoardResponseDto.from(board);
+    }
+
+    //QueryDSL 사용 게시판 조회
+    @Transactional(readOnly = true)
+    public BoardListResponseDto search(String keyword, String ownerNickname) {
+        return BoardListResponseDto.from(boardRepository.search(keyword, ownerNickname));
     }
 
     // [게시판 주인 수정]
