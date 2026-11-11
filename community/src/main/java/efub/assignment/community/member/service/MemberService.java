@@ -8,7 +8,6 @@ import efub.assignment.community.member.dto.response.GetMemberResponseDto;
 import efub.assignment.community.member.dto.response.MemberResponseDto;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,26 +22,26 @@ public class MemberService {
     // 회원 조회
     public GetMemberResponseDto getMember(Long memberId) {
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
         return GetMemberResponseDto.from(member);
     }
 
     // 회원 가입
     @Transactional
-    public MemberResponseDto createMember(CreateMemberRequestDto requestDto) {
+    public Long createMember(CreateMemberRequestDto requestDto) {
         if (memberRepository.existsByEmail(requestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 email 입니다." + requestDto.getEmail());
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
         }
         Member member = requestDto.toEntity();
         Member savedMember = memberRepository.save(member);
-        return MemberResponseDto.from(savedMember);
+        return savedMember.getMemberId();
     }
 
     // 회원 프로필 수정
     @Transactional
     public MemberResponseDto updateProfile(Long memberId, ProfileUpdateRequestDto requestDto) {
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
         member.updateProfile(requestDto.getNickname());
         return MemberResponseDto.from(member);
     }
@@ -51,7 +50,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(Long memberId) {
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
         memberRepository.delete(member);
     }
 

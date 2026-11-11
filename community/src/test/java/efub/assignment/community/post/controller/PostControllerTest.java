@@ -2,52 +2,50 @@ package efub.assignment.community.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import efub.assignment.community.board.domain.Board;
+import efub.assignment.community.board.repository.BoardRepository;
 import efub.assignment.community.member.domain.Member;
+import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.dto.request.PostCreateRequest;
 import efub.assignment.community.post.dto.request.PostUpdateRequest;
-import efub.assignment.community.post.dto.response.PostResponse;
-import efub.assignment.community.post.service.PostService;
+import efub.assignment.community.post.repository.PostRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@WebMvcTest(PostController.class)
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@MockitoBean(types = JpaMetamodelMappingContext.class)
+@ActiveProfiles("test")
+@Transactional
 public class PostControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockitoBean
-    private PostService postService;
+    @Autowired MockMvc mockMvc;
+    @Autowired ObjectMapper objectMapper;
+    @Autowired EntityManager em;
+    @Autowired MemberRepository memberRepository;
+    @Autowired BoardRepository boardRepository;
+    @Autowired PostRepository postRepository;
 
     private Member testMember;
     private Board testBoard;
@@ -55,142 +53,119 @@ public class PostControllerTest {
 
     @BeforeEach
     void setUp() {
-        testMember = Member.builder()
+        testMember = memberRepository.save(Member.builder()
                 .email("test@ewha.ac.kr")
                 .password("1234")
                 .nickname("김남우")
                 .university("이화여자대학교")
                 .studentId("1111111")
-                .build();
+                .build());
 
-        testBoard = Board.builder()
+        testBoard = boardRepository.save(Board.builder()
                 .owner(testMember)
                 .boardname("게시판1")
                 .description("안녕하세요!")
                 .notice("존댓말 사용 부탁드립니다~")
-                .build();
+                .build());
 
-        testPost = Post.builder()
+        testPost = postRepository.save(Post.builder()
                 .board(testBoard)
                 .writer(testMember)
                 .anonymous(true)
                 .content("글 내용")
-                .build();
+                .build());
     }
 
-    // 게시글 상세 조회 성공
     @Test
+    @DisplayName("GET /posts/{postId} -> 200 & 응답 필드 검증")
     void get_post_success() throws Exception {
-        // given
-        given(postService.getPost(1L))
-                .willReturn(PostResponse.from(testPost));
-
-        // when & then
-        mockMvc.perform(get("/posts/{postId}", 1L))
+        mockMvc.perform(get("/posts/{postId}", testPost.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value(testPost.getContent()));
-
-        verify(postService).getPost(1L);
+                .andExpect(jsonPath("$.content").value("글 내용"));
     }
 
-    // 게시글 수정 성공
     @Test
+    @DisplayName("PATCH /posts/{postId} -> 200 & DB 반영")
     void update_post_success() throws Exception {
         // given
-        Long memberId = 1L;
-        Long postId = 1L;
-        String updatedContent = "수정된 글";
+        PostUpdateRequest request = new PostUpdateRequest("수정된 글");
 
-        Post updatedPost = Post.builder()
-                .board(testBoard)
-                .writer(testMember)
-                .anonymous(true)
-                .content(updatedContent)
-                .build();
-
-        PostUpdateRequest request = new PostUpdateRequest(updatedContent);
-
-        given(postService.updatePostContent(eq(postId), eq(memberId), any(PostUpdateRequest.class)))
-                .willReturn(PostResponse.from(updatedPost));
-
-        // when & then
-        mockMvc.perform(patch("/posts/{postId}", postId)
-                .header("Auth-Id", memberId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        // when
+        mockMvc.perform(patch("/posts/{postId}", testPost.getId())
+                        .header("Auth-Id", testMember.getMemberId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value(updatedContent));
+                .andExpect(jsonPath("$.content").value("수정된 글"));
 
-        verify(postService).updatePostContent(eq(postId), eq(memberId), any(PostUpdateRequest.class));
+        // then
+        assertThat(findPostFromDb().getContent()).isEqualTo("수정된 글");
     }
 
-    // 게시글 수정 요청 시 Auth-Id 누락 예외 처리
     @Test
+    @DisplayName("PATCH /posts/{postId} Auth-Id 누락 -> 400 & 수정 x")
     void throw_exception_when_header_not_exist_in_update() throws Exception {
-        // given
-        Long postId = 1L;
-        String updatedContent = "수정된 글";
+        PostUpdateRequest request = new PostUpdateRequest("수정된 글");
 
-        PostUpdateRequest request = new PostUpdateRequest(updatedContent);
-
-        // when & then
-        mockMvc.perform(patch("/posts/{postId}", postId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(patch("/posts/{postId}", testPost.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(MissingRequestHeaderException.class));
 
-        verifyNoInteractions(postService);
+        assertThat(findPostFromDb().getContent()).isEqualTo("글 내용");
     }
 
-    // 게시글 수정 요청 시 PostUpdateRequest.content null, 빈 칸, 공백, MAX 초과 예외 처리
     @ParameterizedTest
     @MethodSource("invalidContents")
+    @DisplayName("PATCH /posts/{postId} 잘못된 content -> 400 & 수정 x")
     void throw_exception_when_content_not_valid(String content) throws Exception {
-        // given
         PostUpdateRequest request = new PostUpdateRequest(content);
 
-        // when & then
-        mockMvc.perform(patch("/posts/{postId}", 1L)
-                        .header("Auth-Id", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(patch("/posts/{postId}", testPost.getId())
+                        .header("Auth-Id", testMember.getMemberId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(MethodArgumentNotValidException.class));
 
-        verifyNoInteractions(postService);
+        assertThat(findPostFromDb().getContent()).isEqualTo("글 내용");
     }
 
-    // 게시글 삭제 성공
     @Test
+    @DisplayName("DELETE /posts/{postId} -> 204 & DB에서 삭제")
     void delete_post_success() throws Exception {
-        // given
-        Long memberId = 1L;
-        Long postId = 1L;
+        Long postId = testPost.getId();
 
-        // when & then
         mockMvc.perform(delete("/posts/{postId}", postId)
-                        .header("Auth-Id", memberId))
+                        .header("Auth-Id", testMember.getMemberId()))
                 .andExpect(status().isNoContent());
 
-        verify(postService).deletePost(postId, memberId);
+        em.flush();
+        em.clear();
+        assertThat(postRepository.findById(postId)).isEmpty();
     }
 
-    // 게시글 삭제 요청 시 Auth-Id 누락 예외 처리
     @Test
+    @DisplayName("DELETE /posts/{postId} Auth-Id 누락 -> 400 & 삭제 x")
     void throw_exception_when_header_not_exist_in_delete() throws Exception {
-        // given
-        Long postId = 1L;
-
-        // when & then
-        mockMvc.perform(delete("/posts/{postId}", postId))
+        mockMvc.perform(delete("/posts/{postId}", testPost.getId()))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertThat(result.getResolvedException())
                         .isInstanceOf(MissingRequestHeaderException.class));
 
-        verifyNoInteractions(postService);
+        em.flush();
+        em.clear();
+        assertThat(postRepository.findById(testPost.getId())).isPresent();
+    }
+
+    // flush/clear 후 DB에서 testPost 재조회
+    private Post findPostFromDb() {
+        em.flush();
+        em.clear();
+        return postRepository.findById(testPost.getId()).orElseThrow();
     }
 
     static Stream<Named<String>> invalidContents() {
