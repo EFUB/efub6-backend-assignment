@@ -33,7 +33,7 @@ public class SecurityConfig {
                     requests.anyRequest().authenticated();
                 })
                 .sessionManagement(
-                        sessiongManagement -> sessiongManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))

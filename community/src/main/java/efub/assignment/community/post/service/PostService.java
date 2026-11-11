@@ -12,6 +12,7 @@ import efub.assignment.community.post.dto.request.PostCreateRequest;
 import efub.assignment.community.post.dto.request.PostUpdateRequest;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
+import efub.assignment.community.post.dto.response.PostSearchResponseDto;
 import efub.assignment.community.post.dto.summary.PostSummary;
 import efub.assignment.community.post.repository.PostLikeRepository;
 import efub.assignment.community.post.repository.PostRepository;
@@ -40,6 +41,14 @@ public class PostService {
         Post newPost = request.toEntity(board, writerAccount);
         postRepository.save(newPost);
         return PostResponse.from(newPost);
+    }
+
+    // 게시글 검색 (게시판 이름, 작성자 닉네임, 키워드)
+    @Transactional(readOnly = true)
+    public List<PostSearchResponseDto> searchPost(String boardName, String writerName, String keyword) {
+        return postRepository.search(boardName, writerName, keyword).stream()
+                .map(PostSearchResponseDto::new)
+                .toList();
     }
 
     // 게시글 목록 조회
