@@ -49,8 +49,8 @@ public class PostController {
 
     @GetMapping("/search")
     public ResponseEntity<PostListResponseDto> search(@RequestParam(value = "keyword", required = false) String keyword,
-                                                       @RequestParam(value = "ownerName", required = false) String ownerName) {
-        PostListResponseDto response = postService.search(keyword, ownerName);
+                                                       @RequestParam(value = "writerNickName", required = false) String writerNickName) {
+        PostListResponseDto response = postService.search(keyword, writerNickName);
 
         return ResponseEntity.ok(response);
     }
