@@ -105,6 +105,15 @@ public class PostService {
         postLikeRepository.delete(postLike);
     }
 
+    @Transactional(readOnly = true)
+    public PostListResponse search(String keyword) {
+        List<PostSummary> postSummaries = postRepository.search(keyword).stream()
+                .map(PostSummary::from)
+                .toList();
+
+        return new PostListResponse(postSummaries, (long) postSummaries.size());
+    }
+
     public Post findByPostId(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));

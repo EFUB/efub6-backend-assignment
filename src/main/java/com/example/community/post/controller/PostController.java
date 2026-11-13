@@ -73,4 +73,12 @@ public class PostController {
         postService.deletePostLike(postId, memberId);
         return ResponseEntity.noContent().build();
     }
+
+    // 글 검색
+    @GetMapping("posts/search")
+    public ResponseEntity<PostListResponse> search(
+            @RequestParam(value = "keyword", required = false) String keyword
+    ) {
+        return ResponseEntity.ok(postService.search(keyword));
+    }
 }
