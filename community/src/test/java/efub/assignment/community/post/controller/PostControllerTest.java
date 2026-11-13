@@ -158,6 +158,24 @@ class PostControllerTest {
     }
 
     @Test
+    @DisplayName("게시글 동적 검색 성공: 검색어와 작성자 조건을 함께 전달한다")
+    void searchPostsWithWriter_success() throws Exception {
+        PostSummaryDto summary = new PostSummaryDto(POST_ID, "스프링 테스트", false, 5L, 3L);
+        PostListResponseDto response = new PostListResponseDto(List.of(summary), 1L);
+        when(postService.searchPosts(BOARD_ID, "스프링", "이펍")).thenReturn(response);
+
+        mockMvc.perform(get("/boards/{boardId}/posts/search", BOARD_ID)
+                        .with(authenticatedMember(MEMBER_ID))
+                        .param("keyword", "스프링")
+                        .param("writer", "이펍"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalPosts").value(1))
+                .andExpect(jsonPath("$.posts[0].title").value("스프링 테스트"));
+
+        verify(postService).searchPosts(BOARD_ID, "스프링", "이펍");
+    }
+
+    @Test
     @DisplayName("게시글 검색 실패: 검색어가 비어 있으면 400을 반환한다")
     void searchPosts_fail_blankKeyword() throws Exception {
         when(postService.searchPosts(BOARD_ID, "   "))

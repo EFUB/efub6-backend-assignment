@@ -9,6 +9,7 @@ import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.domain.PostLike;
 import efub.assignment.community.post.dto.request.CreatePostRequestDto;
+import efub.assignment.community.post.dto.request.PostSearchCondition;
 import efub.assignment.community.post.dto.request.UpdatePostRequestDto;
 import efub.assignment.community.post.dto.response.PostListResponseDto;
 import efub.assignment.community.post.dto.response.PostResponseDto;
@@ -71,16 +72,30 @@ public class PostService {
     // 게시글 제목/내용 검색
     @Transactional(readOnly = true)
     public PostListResponseDto searchPosts(Long boardId, String keyword) {
-        if (keyword == null || keyword.isBlank()) {
-            throw new CustomException(ErrorCode.INVALID_INPUT);
-        }
+        PostSearchCondition condition = new PostSearchCondition(keyword, null);
+        validateSearchCondition(condition);
 
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-        String normalizedKeyword = keyword.trim();
         List<PostSummaryDto> posts = toPostSummaries(
-                postRepository.searchByBoardIdAndKeyword(boardId, normalizedKeyword)
+                postRepository.searchByBoardIdAndKeyword(boardId, condition.keyword())
+        );
+
+        return new PostListResponseDto(posts, (long) posts.size());
+    }
+
+    // 게시글 동적 검색: 검색어와 작성자 닉네임을 선택적으로 조합한다.
+    @Transactional(readOnly = true)
+    public PostListResponseDto searchPosts(Long boardId, String keyword, String writer) {
+        PostSearchCondition condition = new PostSearchCondition(keyword, writer);
+        validateSearchCondition(condition);
+
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        List<PostSummaryDto> posts = toPostSummaries(
+                postRepository.searchByConditions(boardId, condition)
         );
 
         return new PostListResponseDto(posts, (long) posts.size());
@@ -166,6 +181,12 @@ public class PostService {
     private void authorizePostWriter(Post post, Member member) {
         if (!post.getMember().getMemberId().equals(member.getMemberId())) {
             throw new CustomException(ErrorCode.POST_MEMBER_MISMATCH);
+        }
+    }
+
+    private void validateSearchCondition(PostSearchCondition condition) {
+        if (condition.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
         }
     }
 }
