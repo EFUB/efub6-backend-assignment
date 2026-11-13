@@ -27,7 +27,6 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
             builder.and(board.name.containsIgnoreCase(keyword)
                     .or(post.title.containsIgnoreCase(keyword))
                     .or(post.content.containsIgnoreCase(keyword))
-                    .or(member.nickname.containsIgnoreCase(keyword))
                     // 익명 게시글 제외
                     .or(post.isAnonymous.isFalse().and(member.nickname.containsIgnoreCase(keyword)))
             );
