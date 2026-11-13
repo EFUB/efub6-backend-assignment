@@ -9,6 +9,7 @@ import com.example.community.member.service.MemberService;
 import com.example.community.post.domain.Post;
 import com.example.community.post.domain.PostLike;
 import com.example.community.post.dto.request.CreatePostRequest;
+import com.example.community.post.dto.request.PostSearchRequest;
 import com.example.community.post.dto.request.UpdatePostRequest;
 import com.example.community.post.dto.response.PostListResponse;
 import com.example.community.post.dto.response.PostResponse;
@@ -103,6 +104,14 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_LIKE_NOT_FOUND));
 
         postLikeRepository.delete(postLike);
+    }
+
+    @Transactional(readOnly = true)
+    public PostListResponse searchPosts(PostSearchRequest request) {
+        List<PostSummary> summaries = postRepository.search(request.toCondition())
+                .stream().map(PostSummary::from)
+                .toList();
+        return new PostListResponse(summaries, (long) summaries.size());
     }
 
     public Post findByPostId(Long postId) {

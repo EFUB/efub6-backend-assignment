@@ -37,7 +37,7 @@ public class MemberController {
     // 회원 수정
     @PatchMapping("/profile/{memberId}")
     public ResponseEntity<MemberResponseDto> updateMember(@PathVariable Long memberId,
-                                                          @RequestBody UpdateMemberRequestDto requestDto) {
+                                                          @Valid @RequestBody UpdateMemberRequestDto requestDto) {
         MemberResponseDto responseDto = memberService.updateMember(memberId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
