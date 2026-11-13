@@ -12,6 +12,7 @@ import efub.assignment.community.post.dto.request.CreatePostRequest;
 import efub.assignment.community.post.dto.request.UpdatePostRequest;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
+import efub.assignment.community.post.dto.response.PostSearchResponseDto;
 import efub.assignment.community.post.dto.summary.PostSummary;
 import efub.assignment.community.post.repository.PostLikeRepository;
 import efub.assignment.community.post.repository.PostRepository;
@@ -49,6 +50,14 @@ public class PostService {
                 .stream()
                 .map(PostSummary::from).toList();
         return new PostListResponse(postSummaries, postRepository.count());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostSearchResponseDto> searchPost(String keyword, String writerNickname) {
+        return postRepository.search(keyword, writerNickname)
+                .stream()
+                .map(PostSearchResponseDto::new)
+                .toList();
     }
 
     @Transactional

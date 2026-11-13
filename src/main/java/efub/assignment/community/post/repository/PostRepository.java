@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository {
 
     // 생성한 날짜 정렬 전체 조회
     List<Post> findAllByOrderByCreatedAtDesc();
