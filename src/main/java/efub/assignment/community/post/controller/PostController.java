@@ -4,6 +4,7 @@ import efub.assignment.community.post.dto.request.CreatePostRequest;
 import efub.assignment.community.post.dto.request.UpdatePostRequest;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
+import efub.assignment.community.post.dto.response.PostSearchResponseDto;
 import efub.assignment.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,13 +27,21 @@ public class PostController {
                                            @RequestHeader("Auth-Id") Long memberId,
                                            @Valid @RequestBody CreatePostRequest request) {
         Long postId = postService.createPost(boardId, memberId, request);
-        return ResponseEntity.created(URI.create("/boards/"+boardId+"/posts/"+postId)).build();
+        return ResponseEntity.created(URI.create("/boards/" + boardId + "/posts/" + postId)).build();
     }
 
     // 게시글 전체 조회
     @GetMapping("/posts")
     public ResponseEntity<PostListResponse> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    // 게시글 검색 (키워드: 제목/내용, 작성자 닉네임) - 조건은 모두 선택
+    @GetMapping("/posts/search")
+    public ResponseEntity<List<PostSearchResponseDto>> searchPost(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "writer", required = false) String writerNickname) {
+        return ResponseEntity.ok(postService.searchPost(keyword, writerNickname));
     }
 
     // 게시글 단건 내용 조회
@@ -60,7 +70,7 @@ public class PostController {
     // 게시글 좋아요 생성
     @PostMapping("/posts/{postId}/like")
     public ResponseEntity<PostResponse> likePost(@PathVariable("postId") Long postId,
-                                           @RequestHeader("Auth-Id") Long memberId) {
+                                                 @RequestHeader("Auth-Id") Long memberId) {
         PostResponse response = postService.likePost(postId, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -68,7 +78,7 @@ public class PostController {
     // 게시글 좋아요 삭제
     @DeleteMapping("/posts/{postId}/like")
     public ResponseEntity<Void> unlikePost(@PathVariable("postId") Long postId,
-                                             @RequestHeader("Auth-Id") Long memberId) {
+                                           @RequestHeader("Auth-Id") Long memberId) {
         postService.unlikePost(postId, memberId);
         return ResponseEntity.noContent().build();
     }
