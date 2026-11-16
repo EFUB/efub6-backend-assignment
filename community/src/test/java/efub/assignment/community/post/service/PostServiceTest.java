@@ -8,6 +8,7 @@ import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.repository.MemberRepository;
 import efub.assignment.community.post.domain.Post;
 import efub.assignment.community.post.dto.request.CreatePostRequestDto;
+import efub.assignment.community.post.dto.request.PostSearchCondition;
 import efub.assignment.community.post.dto.response.PostListResponseDto;
 import efub.assignment.community.post.dto.response.PostResponseDto;
 import efub.assignment.community.post.repository.PostLikeRepository;
@@ -141,6 +142,42 @@ class PostServiceTest {
 
         verify(boardRepository, never()).findById(any());
         verify(postRepository, never()).searchByBoardIdAndKeyword(any(), any());
+    }
+
+    @Test
+    @DisplayName("검색어와 작성자 조건을 조합해 게시글을 동적으로 검색한다")
+    void searchPostsWithKeywordAndWriter() {
+        Long boardId = 1L;
+        Board board = org.mockito.Mockito.mock(Board.class);
+        Post post = createPost(board, "스프링 테스트", "QueryDSL 동적 쿼리");
+        PostSearchCondition condition = new PostSearchCondition("스프링", "이펍");
+
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(postRepository.searchByConditions(boardId, condition)).thenReturn(List.of(post));
+        when(postLikeRepository.countByPost(post)).thenReturn(2L);
+
+        PostListResponseDto result = postService.searchPosts(
+                boardId,
+                "  스프링  ",
+                "  이펍  "
+        );
+
+        assertThat(result.totalPosts()).isEqualTo(1L);
+        assertThat(result.posts().get(0).title()).isEqualTo("스프링 테스트");
+        assertThat(result.posts().get(0).likeCount()).isEqualTo(2L);
+        verify(postRepository).searchByConditions(boardId, condition);
+    }
+
+    @Test
+    @DisplayName("검색어와 작성자 조건이 모두 비어 있으면 검색할 수 없다")
+    void searchPostsWithEmptyConditions() {
+        assertThatThrownBy(() -> postService.searchPosts(1L, " ", " "))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.INVALID_INPUT);
+
+        verify(boardRepository, never()).findById(any());
+        verify(postRepository, never()).searchByConditions(any(), any());
     }
 
     private Post createPost(Board board, String title, String content) {

@@ -45,9 +45,12 @@ public class PostController {
     @GetMapping("/boards/{boardId}/posts/search")
     public ResponseEntity<PostListResponseDto> searchPosts(
             @PathVariable("boardId") Long boardId,
-            @RequestParam("keyword") String keyword
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "writer", required = false) String writer
     ) {
-        PostListResponseDto responseDto = postService.searchPosts(boardId, keyword);
+        PostListResponseDto responseDto = writer == null || writer.isBlank()
+                ? postService.searchPosts(boardId, keyword)
+                : postService.searchPosts(boardId, keyword, writer);
         return ResponseEntity.ok(responseDto);
     }
 
