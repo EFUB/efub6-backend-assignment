@@ -13,6 +13,7 @@ import efub.assignment.community.post.dto.request.PostUpdateRequest;
 import efub.assignment.community.post.dto.response.PostLikeResponse;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
+import efub.assignment.community.post.dto.response.PostSearchResponse;
 import efub.assignment.community.post.dto.summary.PostSummary;
 import efub.assignment.community.post.repository.PostLikeRepository;
 import efub.assignment.community.post.repository.PostRepository;
@@ -114,6 +115,13 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
 
         postLikeRepository.delete(like);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostSearchResponse> searchPost(String keyword, String writerNickname){
+        return postRepository.search(keyword, writerNickname).stream()
+                .map(PostSearchResponse::new)
+                .toList();
     }
 
     public Post findByPostId(Long postId) {
