@@ -1,5 +1,7 @@
 package efub.assignment.community.member.service;
 
+import efub.assignment.community.global.exception.CustomException;
+import efub.assignment.community.global.exception.ErrorCode;
 import efub.assignment.community.member.domain.Member;
 import efub.assignment.community.member.dto.request.MemberCreateRequestDto;
 import efub.assignment.community.member.dto.request.MemberUpdateRequestDto;
@@ -20,7 +22,7 @@ public class MemberService {
     //멤버 조회
     public MemberResponseDto getMember(Long memberId){
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         return MemberResponseDto.from(member);
     }
 
@@ -39,11 +41,10 @@ public class MemberService {
     }
 
     //멤버 수정
-    //멤버 수정
     @Transactional
     public MemberResponseDto updateMember(Long memberId, MemberUpdateRequestDto requestDto){
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         member.updateMember(requestDto.getNickname(), requestDto.getEmail(), requestDto.getPassword());
 
@@ -54,7 +55,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(Long memberId) {
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         memberRepository.delete(member);
 
     }
@@ -62,6 +63,6 @@ public class MemberService {
 
     public Member findByMemberId(Long memberId) {
         return memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }
