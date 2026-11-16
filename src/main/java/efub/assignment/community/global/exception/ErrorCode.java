@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     // account
     ACCOUNT_NOT_FOUND(404, "존재하는 계정이 없습니다."),
+    EMAIL_ALREADY_EXISTS(409, "이미 존재하는 이메일입니다."),
 
     // post
     POST_NOT_FOUND(404, "해당 id의 게시물이 존재하지 않습니다."),

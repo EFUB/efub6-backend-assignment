@@ -21,7 +21,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public MemberResponseDto getMember(Long memberId){
         Member member = membersRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다."));
+                .orElseThrow(()-> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
         return MemberResponseDto.from(member);
     }
 
@@ -29,7 +29,7 @@ public class MemberService {
     public MemberResponseDto createMember(CreateMemberRequestDto requestDto) {
         // 이메일 중복 검사
         if(membersRepository.existsByEmail(requestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 email입니다. "+requestDto.getEmail());
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         Member member = requestDto.toEntity();
         Member savedMember = membersRepository.save(member);
@@ -40,7 +40,7 @@ public class MemberService {
     @Transactional
     public MemberResponseDto updateMember(Long memberId, UpdateMemberRequestDto requestDto) {
         Member member = membersRepository.findByMemberId(memberId)
-                .orElseThrow(()->new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(()->new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
         member.updateNickname(requestDto.getNickname());
         return MemberResponseDto.from(member);
     }
@@ -49,7 +49,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(Long memberId) {
         Member member = membersRepository.findByMemberId(memberId)
-                .orElseThrow(()->new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
+                .orElseThrow(()->new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
         member.changeStatus(MemberStatus.UNREGISTER);
     }
 
@@ -57,13 +57,13 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member findByMemberId(Long memberId) {
         return membersRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public Member findByNickname(String nickname) {
         return membersRepository.findByNickname(nickname)
-                .orElseThrow(() -> new IllegalArgumentException("해당 닉네임을 가진 회원을 찾을 수 없습니다. 닉네임: " + nickname));
+                .orElseThrow(() -> new CustomException(ErrorCode.ACCOUNT_NOT_FOUND));
     }
 
     public Member findByEmail(String email) {
