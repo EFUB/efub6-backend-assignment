@@ -1,6 +1,7 @@
 package com.example.community.post.controller;
 
 import com.example.community.post.dto.request.CreatePostRequest;
+import com.example.community.post.dto.request.PostSearchRequest;
 import com.example.community.post.dto.request.UpdatePostRequest;
 import com.example.community.post.dto.response.PostListResponse;
 import com.example.community.post.dto.response.PostResponse;
@@ -71,5 +72,14 @@ public class PostController {
                                                @RequestHeader("Auth-Id") Long memberId) {
         postService.deletePostLike(postId, memberId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 검색
+    @GetMapping("/posts/search")
+    public ResponseEntity<PostListResponse> searchPosts(
+            @ModelAttribute PostSearchRequest request
+    ) {
+        PostListResponse response = postService.searchPosts(request);
+        return ResponseEntity.ok(response);
     }
 }
