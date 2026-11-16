@@ -2,9 +2,11 @@ package efub.assignment.community.member.dto.request;
 
 import efub.assignment.community.member.domain.Member;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class CreateMemberRequestDto {
     @NotBlank
     private String password;
