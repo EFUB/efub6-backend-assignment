@@ -89,7 +89,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("성공 - 게시글 생성 (Controller)")
+    @DisplayName("POST /posts -> 201, Location 헤더 & H2에 실제 저장")
     void create_post() throws Exception {
 
         //when & then
