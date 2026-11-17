@@ -4,6 +4,7 @@ import efub.assignment.community.post.dto.request.CreatePostRequest;
 import efub.assignment.community.post.dto.request.UpdatePostRequest;
 import efub.assignment.community.post.dto.response.PostListResponse;
 import efub.assignment.community.post.dto.response.PostResponse;
+import efub.assignment.community.post.dto.response.PostSearchResponseDto;
 import efub.assignment.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +34,14 @@ public class PostController {
     @GetMapping("/posts")
     public ResponseEntity<PostListResponse> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    // 게시글 검색 (키워드: 제목/내용, 작성자 닉네임) - 조건은 모두 선택
+    @GetMapping("/posts/search")
+    public ResponseEntity<List<PostSearchResponseDto>> searchPost(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "writer", required = false) String writerNickname) {
+        return ResponseEntity.ok(postService.searchPost(keyword, writerNickname));
     }
 
     // 게시글 단건 내용 조회
